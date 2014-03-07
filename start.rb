@@ -11,7 +11,7 @@ class SecondHunter < Sinatra::Base
     set :public_folder, Proc.new { File.join(root, "assets") }
   end
   get '/' do
-    @title = "Warcraft"
+    @title = "Second Hunter - for real clothes hunters!"
     erb :index
   end
 end
