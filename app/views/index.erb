@@ -17,31 +17,58 @@
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQWuApUanpte7w4Enl4WDKrIQ0m5cYf7E&sensor=false">
 </script>
 <script type="text/javascript">
-  function initialize() {
-    var mapOptions = {
-      center: new google.maps.LatLng(48.887535, 24.707565),
-      zoom: 10
+  function GoogleMapsAction() {
+    var self = this;
+    this.init = function() {
+      this.geocoder = new google.maps.Geocoder();
+      var mapOptions = {
+        center: new google.maps.LatLng(48.887535, 24.707565),
+        zoom: 12
+      };
+      this.map = new google.maps.Map(document.getElementById("map-canvas"),
+              mapOptions);
     };
-    var myLatlng = new google.maps.LatLng(48.85, 24.6)
-    var map = new google.maps.Map(document.getElementById("map-canvas"),
-            mapOptions);
-    // To add the marker to the map, use the 'map' property
-    var marker = new google.maps.Marker({
-      position: myLatlng,
-      map: map,
-      title: "Hello World!"
-    });
-    var contentString = "<ul><li>день оновлення</li><li>Ціна на 1 кг в конкретний день</li><li>Адреса</li><li>Номер телефону<li></ul>"
-    var infowindow = new google.maps.InfoWindow({
-      content: contentString
-    });
+    this.set_shop_markers = function() {
+      $.get('/shops', function(response) {
+        console.log(response);
 
-    // To add the marker to the map, call setMap();
-    marker.setMap(map);
-    google.maps.event.addListener(marker, 'click', function() {
-      infowindow.open(map, marker);
-    });
+        for (var i in response) {
+          var shop = response[i];
+          var address = shop.address + "," + shop.city + "," + "Ukraine";
+          self.code_address(address, shop, function(shop, position) {
+            console.log(position);
+            var marker = new google.maps.Marker({
+              map: self.map,
+              position: position
+            });
+            console.log(shop.title);
+            var infowindow = new google.maps.InfoWindow({
+              content: shop.title
+            });
+            google.maps.event.addListener(marker, 'click', function() {
+              console.log(shop);
+              infowindow.open(self.map, marker);
+            });
+          });
+        }
+      });
+    };
+    this.code_address = function(address, shop, callback) {
+      //var address = document.getElementById("address").value;
+      this.geocoder.geocode({'address': address}, function(results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+          //self.map.setCenter(results[0].geometry.location);
+          callback(shop, results[0].geometry.location);
+        } else {
+          alert("Geocode was not successful for the following reason: " + status);
+        }
+      });
+    }
   }
-
-  google.maps.event.addDomListener(window, 'load', initialize);
+  ;
+  google.maps.event.addDomListener(window, 'load', function() {
+    second_hunter = new GoogleMapsAction();
+    second_hunter.init();
+    second_hunter.set_shop_markers();
+  });
 </script>

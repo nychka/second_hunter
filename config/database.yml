@@ -1,0 +1,16 @@
+development: 
+       adapter: mysql2
+       host: localhost
+       username: root
+       password: 238457
+       database: second_hunter
+       port: 3306
+production: 
+        adapter: mysql2
+        host: localhost
+        username: root
+        password: password
+        database: second_hunter
+        port: 3306
+ 
+    
