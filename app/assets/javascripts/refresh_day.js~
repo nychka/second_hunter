@@ -1,0 +1,52 @@
+  function RefreshDay() {
+
+    this.init = function(days) {
+      this.days = days;
+      //$('input[data-role=day]');
+      this.refresh_class = 'refreshDay';
+
+      this.days.on('change', function() {
+        if (days_are_filled())
+          define_refresh_day();
+        else
+          reset();
+      });
+    };
+    // при редагуванні якось інпута перевіряємо чи усі інпути заповнені, якщо
+    // так тоді визначаємо максимальну ціну і підсвічуємо
+    this.get_max_index = function() {
+      var max_index = 0;
+      var max_price = 0;
+      this.days.each(function(i) {
+        var day = $(this);
+        var price = parseInt(day.val());
+        if (price > max_price) {
+          max_index = i;
+          max_price = price;
+        }
+      });
+      return max_index;
+    };
+    this.reset = function() {
+      this.days.removeClass(this.refresh_class);
+    };
+    this.refresh = function(index) {
+      this.reset();
+      $(this.days[index]).addClass(this.refresh_class);
+    };
+    this.define_refresh_day = function() {
+      this.refresh(this.get_max_index());
+    };
+    this.days_are_filled = function() {
+      var flag = true;
+      this.days.each(function() {
+        var day = $(this);
+        var val = day.val();
+        if (val === "" || val === null || val === undefined) {
+          flag = false;
+          return;
+        }
+      });
+      return flag;
+    };
+  }

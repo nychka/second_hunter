@@ -10,26 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140308113759) do
-
-  create_table "prices", force: true do |t|
-    t.integer  "shop_id",                    null: false
-    t.integer  "user_id",        default: 1
-    t.integer  "price_per_kilo", default: 0
-    t.integer  "day",            default: 0
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "prices", ["shop_id"], name: "index_prices_on_shop_id", using: :btree
-  add_index "prices", ["user_id"], name: "index_prices_on_user_id", using: :btree
+ActiveRecord::Schema.define(version: 20140308113753) do
 
   create_table "shops", force: true do |t|
     t.string   "title",      default: "Second hand"
-    t.string   "city",       default: "Ivano-Frankivsk", null: false
-    t.string   "address",                                null: false
-    t.string   "phone"
-    t.text     "about"
+    t.string   "address",                            null: false
+    t.float    "lat"
+    t.float    "lng"
+    t.boolean  "status",     default: false
+    t.integer  "monday",                             null: false
+    t.integer  "tuesday",                            null: false
+    t.integer  "wednesday",                          null: false
+    t.integer  "thursday",                           null: false
+    t.integer  "friday",                             null: false
+    t.integer  "saturday",                           null: false
+    t.integer  "sunday",                             null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

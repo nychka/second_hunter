@@ -10,13 +10,27 @@
     <link rel="stylesheet" type="text/css" href="stylesheets/style.css" />
     <!-- Bootstrap -->
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <style>
+      .flip {
+        transform: rotateX(-180deg);
+        transform-style: preserve-3d;
+        transition: all 1s ease-in-out 0s;
+        z-index: 800
+      }
+    </style>
   </head>
   <body>
-  <div id="content" class="container">
-    <%= yield %>
-  </div>
-  <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-  <script src="bootstrap/js/bootstrap.min.js"></script>
-  <script type="text/javascript" src="javascripts/main.js"></script>
-</body>
+    <div id="content" class="container">
+      <%= yield %>
+    </div>
+    <script src="javascripts/jquery-1.9.1.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="javascripts/ejs.js"></script>
+    <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQWuApUanpte7w4Enl4WDKrIQ0m5cYf7E&sensor=false">
+    </script>
+    <script type="text/javascript" src="javascripts/google_map.js"></script>
+    <script type="text/javascript" src="javascripts/refresh_day.js"></script>
+    <script type="text/javascript" src="javascripts/main.js"></script>
+  </body>
 </html>

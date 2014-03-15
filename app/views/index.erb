@@ -1,10 +1,64 @@
 <div class="header">
-  <ul class="nav nav-pills pull-right">
+  <nav class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">Second Hunter</a>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li><button id="add_second_hand" class="btn btn-default btn-success navbar-btn" ><span class="glyphicon glyphicon-plus"></span>Add Second Hand</button></li>
+          <!-- li><a href="#">Link</a></li -->
+          <!-- li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="#">Action</a></li>
+              <li><a href="#">Another action</a></li>
+              <li><a href="#">Something else here</a></li>
+              <li class="divider"></li>
+              <li><a href="#">Separated link</a></li>
+              <li class="divider"></li>
+              <li><a href="#">One more separated link</a></li>
+            </ul>
+          </li -->
+        </ul>
+        <!-- form class="navbar-form navbar-left" role="search">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+          <button type="submit" class="btn btn-default">Submit</button>
+        </form -->
+        <ul class="nav navbar-nav navbar-right">
+          <!-- li><a href="#">Link</a></li -->
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= @user %> <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="#">Action</a></li>
+              <li><a href="#">Another action</a></li>
+              <li><a href="#">Something else here</a></li>
+              <li class="divider"></li>
+              <li><a href="#">Separated link</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+  </nav>
+  <!-- ul class="nav nav-pills pull-right">
     <li class="active"><a href="#">Home</a></li>
     <li><a href="#">About</a></li>
     <li><a href="#">Contact</a></li>
   </ul>
-  <h3 class="text-muted">Second Hunter</h3>
+    <a class="text-muted brand">Second Hunter</a>
+    <button class="btn btn-default btn-success" ><span class="glyphicon glyphicon-plus"></span>Add Second Hand</button -->
 </div>
 <div class="jumbotron">
   <!-- iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d20973.13804897089!2d24.71412492590332!3d48.92220775066936!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4730c16c34b0381d%3A0xd6d32394e59e41c2!2z0IbQstCw0L3Qvi3QpNGA0LDQvdC60ZbQstGB0YzQug!5e0!3m2!1suk!2sua!4v1394231458713" width="1000" height="500" frameborder="0" style="border:0"></iframe-->
@@ -13,62 +67,5 @@
 <div class="footer">
   <p>&copy; Company 2014</p>
 </div>
-<script type="text/javascript"
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQWuApUanpte7w4Enl4WDKrIQ0m5cYf7E&sensor=false">
-</script>
-<script type="text/javascript">
-  function GoogleMapsAction() {
-    var self = this;
-    this.init = function() {
-      this.geocoder = new google.maps.Geocoder();
-      var mapOptions = {
-        center: new google.maps.LatLng(48.887535, 24.707565),
-        zoom: 12
-      };
-      this.map = new google.maps.Map(document.getElementById("map-canvas"),
-              mapOptions);
-    };
-    this.set_shop_markers = function() {
-      $.get('/shops', function(response) {
-        console.log(response);
 
-        for (var i in response) {
-          var shop = response[i];
-          var address = shop.address + "," + shop.city + "," + "Ukraine";
-          self.code_address(address, shop, function(shop, position) {
-            console.log(position);
-            var marker = new google.maps.Marker({
-              map: self.map,
-              position: position
-            });
-            console.log(shop.title);
-            var infowindow = new google.maps.InfoWindow({
-              content: shop.title
-            });
-            google.maps.event.addListener(marker, 'click', function() {
-              console.log(shop);
-              infowindow.open(self.map, marker);
-            });
-          });
-        }
-      });
-    };
-    this.code_address = function(address, shop, callback) {
-      //var address = document.getElementById("address").value;
-      this.geocoder.geocode({'address': address}, function(results, status) {
-        if (status == google.maps.GeocoderStatus.OK) {
-          //self.map.setCenter(results[0].geometry.location);
-          callback(shop, results[0].geometry.location);
-        } else {
-          alert("Geocode was not successful for the following reason: " + status);
-        }
-      });
-    }
-  }
-  ;
-  google.maps.event.addDomListener(window, 'load', function() {
-    second_hunter = new GoogleMapsAction();
-    second_hunter.init();
-    second_hunter.set_shop_markers();
-  });
-</script>
+

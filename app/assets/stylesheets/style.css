@@ -85,3 +85,8 @@ body {
 /* USER STYLE*/
 
 #map-canvas {width: 100%; height: 450px;}
+.refreshDay {
+            font-weight: bold;
+            background-color: activecaption !important;
+}
+input[data-role=day] {border-radius: 40px;}

@@ -1,21 +1,16 @@
 $(document).ready(function(){
-    var checkboxes = $('input[type=checkbox]');
-    checkboxes.on('click', function(){
-        var $this = $(this);
-        var linked = null;
-        ($this.is(":checked")) ? linked = 1 : linked = 0;
-        console.log($this);
-        id = parseInt($this.attr('id'));
-        console.log("ID: " + id + " Linked: " + linked);
-        $.ajax({
-           url: '/link/'+ id +'/' + linked,
-           method: 'post',
-           success: function(response){
-               console.log(response);
-           }
-        });
-    });
+   var refresh_day = new RefreshDay($('input[data-role=day]'));
+   $('#add_second_hand').on('click', function(){
+       //TODO: create popup with form
+      window.location.href = '/new';
+   });
 });
+//Google Maps Initialization
+google.maps.event.addDomListener(window, 'load', function() {
+    google_map = new GoogleMap();
+    google_map.init();
+    google_map.set_shop_markers();
+  });
 
 
 

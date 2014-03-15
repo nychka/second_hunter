@@ -1,0 +1,30 @@
+
+<h2><%= title %></h1>
+<h3><%= address %></h3>
+
+ <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Понеділок</th>
+          <th>Вівторок</th>
+          <th>Середа</th>
+          <th>Четвер</th>
+          <th>Пятниця</th>
+          <th>Субота</th>
+          <th>Неділя</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Ціна за 1 кг</td>
+          <td data-role="day"><%= monday %></td>
+          <td data-role="day"><%= tuesday %></td>
+          <td data-role="day"><%= wednesday %></td>
+          <td data-role="day"><%= thursday %></td>
+          <td data-role="day"><%= friday %> </td>
+          <td data-role="day"><%= saturday %></td>
+          <td data-role="day"><%= sunday %></td>
+        </tr>
+      </tbody>
+    </table>

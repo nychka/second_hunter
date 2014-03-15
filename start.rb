@@ -45,7 +45,31 @@ class SecondHunter < Sinatra::Base
   end
   get '/' do
     @title = "Second Hunter - for real clothes hunters!"
+    @user = "Yaroslav"
     erb :index
+  end
+  get '/new' do
+    erb :new
+  end
+  get '/add' do
+    days = params[:days]
+    raise StandardError, "Not all days were passed" unless days.count == 7
+    settings = {}
+    settings[:title] = params[:title]
+    settings[:address] = params[:address]
+    location = geocode(settings[:address])
+    settings[:lng] = location["lng"]
+    settings[:lat] = location["lat"]
+    settings[:monday] = days["monday"]
+    settings[:tuesday] = days["tuesday"]
+    settings[:wednesday] = days["wednesday"]
+    settings[:thursday] = days["thursday"]
+    settings[:friday] = days["friday"]
+    settings[:saturday] = days["saturday"]
+    settings[:sunday] = days["sunday"]
+    p settings
+    Shop.create settings
+    redirect to "/"
   end
   get '/shop/:id' do
     @shop = Shop.find(params[:id])
