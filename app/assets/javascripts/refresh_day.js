@@ -5,9 +5,7 @@ function RefreshDay(days) {
         this.days = days;
         this.refresh_class = 'refreshDay';
         
-        this.days.off('keyup').on('keyup', function(e) {
-            self.run();
-        });
+        this.days.off('keyup').on('keyup', function(e) {self.run();});
         self.run();
     };
     this.run = function() {

@@ -55,7 +55,7 @@ class SecondHunter < Sinatra::Base
     days = params[:days]
     raise StandardError, "Not all days were passed" unless days.count == 7
     settings = {}
-    settings[:title] = params[:title]
+    settings[:title] = params[:title] if params[:title].length > 3
     settings[:address] = params[:address]
     location = geocode(settings[:address])
     settings[:lng] = location["lng"]
