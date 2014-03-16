@@ -9,6 +9,23 @@ function GoogleMap() {
                 mapOptions);
         this.seconds = [];
         this.second_show_time = 200;
+        this.add_legend(this.create_legend());
+    };
+    this.create_legend = function(){
+        var base = "images/google_maps_markers/cool/PNG/";
+        var icons = [
+            {image: "pin-red-solid-15.png",title: "День оновлення"},
+            {image: "pin-yellow-solid-15.png",title: "День після оновлення"},
+            {image: "pin-blue-solid-15.png",title: "Звичайний день"}
+        ];
+        var html = new EJS({url: 'templates/legend.ejs'}).render({base: base, icons: icons});
+        console.log(html);
+        var div = document.createElement('div');
+        div.innerHTML = html;
+        return div;
+    };
+    this.add_legend = function(legend){
+        this.map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legend);
     };
     this.set_shop_markers = function() {
         $.get('/shops', function(shops) {
@@ -37,6 +54,7 @@ function Second(shop, map) {
         this.shop = shop;
         this.position = {lng: shop.lng, lat: shop.lat};
         this.map = map;
+        this.refresh_day = this.define_refresh_day();
         var content = self.create_content();
         self.create_info_window(content);
     };
@@ -75,15 +93,14 @@ function Second(shop, map) {
         return marker;
     };
     this.define_icon_for_marker = function() {
-        var refresh_day = this.define_refresh_day();
-        var right = this.DAYS.slice(refresh_day);
-        var left = this.DAYS.slice(0, refresh_day);
+        var right = this.DAYS.slice(this.refresh_day);
+        var left = this.DAYS.slice(0, this.refresh_day);
         var sorted_days_by_freshness = right.concat(left);
         var today = new Date();
         var day_of_week = this.DAYS[today.getDay()];
         var index = sorted_days_by_freshness.indexOf(day_of_week);
         var icon = this.icon_base + this.icons[index];
-        console.log("Today image is: " + icon + " because refresh day is: " + this.DAYS[refresh_day]);
+        console.log("Today image is: " + icon + " because refresh day is: " + this.DAYS[this.refresh_day]);
         return icon;
     };
     this.show = function(time) {
@@ -102,8 +119,10 @@ function Second(shop, map) {
         });
         this.info_window = info_window;
         google.maps.event.addListener(this.info_window, 'domready', function() {
-            var days = $('td[data-role=day]');
-            new RefreshDay(days);
+            var days = $('td[data-day='+self.DAYS[self.refresh_day]+']').addClass('refreshDay');
+            var today = new Date().getDay();
+            $('td[data-day='+ self.DAYS[today] +']').addClass('today');
+            //new RefreshDay(days);
         });
         return this.info_window;
     };

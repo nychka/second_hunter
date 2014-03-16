@@ -89,4 +89,6 @@ body {
             font-weight: bold;
             background-color: activecaption !important;
 }
+.today {background-color: yellow !important;}
 input[data-role=day] {border-radius: 40px;}
+.legend {background-color: white; padding: 5px;}
