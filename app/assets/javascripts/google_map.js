@@ -1,30 +1,96 @@
 function GoogleMap() {
     var self = this;
     this.init = function() {
+        this.position = new google.maps.LatLng(48.887535, 24.707565);
+        this.geocoder = new google.maps.Geocoder();
+
         var mapOptions = {
-            center: new google.maps.LatLng(48.887535, 24.707565),
+            center: self.position,
             zoom: 12
         };
         this.map = new google.maps.Map(document.getElementById("map-canvas"),
                 mapOptions);
         this.seconds = [];
-        this.second_show_time = 200;
+        this.second_show_time = 500;
         this.add_legend(this.create_legend());
     };
-    this.create_legend = function(){
+    this.add_second_marker = function() {
+        this.new_second_marker = new google.maps.Marker({
+            map: self.map,
+            position: self.position,
+            draggable: true
+        });
+        google.maps.event.addListener(this.new_second_marker, "dragend", function() {
+            var pos = self.new_second_marker.getPosition();
+            self.set_new_second_location(pos.lat(), pos.lng());
+        });
+    };
+    this.set_new_second_location = function(lat, lng) {
+        //1. геокодуємо координати у вулицю
+        self.get_address_from_lat_lng(lat, lng, function(address) {
+            //2. записуємо вулицю в поле адреси
+            $('#second_address').val(address);
+            //3. записуємо координати в приховані поля форми
+            self.set_hidden_lat_lng(lat,lng);
+        });
+    };
+    /*
+     * Геокодування адреси в координати
+     */
+    this.get_lat_lng_from_address = function(address) {
+        //var address = document.getElementById("address").value;
+        this.geocoder.geocode({'address': address}, function(results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                var location = results[0].geometry.location;
+                self.map.setCenter(location);
+                self.new_second_marker.setPosition(location);
+                self.set_hidden_lat_lng(location.lat(), location.lng());
+            } else {
+                alert("Geocode was not successful for the following reason: " + status);
+            }
+        });
+    };
+    this.set_hidden_lat_lng = function(lat, lng) {
+        if (lat && lng) {
+            $('#lat').val(lat);
+            $('#lng').val(lng);
+        }else {throw new Error("Location isn't correct!");}
+    };
+    this.remove_add_second_marker = function() {
+        this.add_second_marker.setMap(null);
+    };
+    this.get_address_from_lat_lng = function(lat, lng, callback) {
+
+        var latlng = new google.maps.LatLng(lat, lng);
+        this.geocoder.geocode({'latLng': latlng}, function(results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                if (results[0]) {
+                    //var infowindow = new google.maps.InfoWindow();
+                    //infowindow.setContent(results[1].formatted_address);
+                    //infowindow.open(self.map, self.new_second_marker);
+                    console.log(results);
+                    callback.call(self, results[0].formatted_address);
+                }
+            } else {
+                alert("Geocoder failed due to: " + status);
+            }
+        });
+    }
+
+    //TODO: добавляти нові елементи при різних умовах
+    this.create_legend = function() {
         var base = "images/google_maps_markers/cool/PNG/";
         var icons = [
-            {image: "pin-red-solid-15.png",title: "День оновлення"},
-            {image: "pin-yellow-solid-15.png",title: "День після оновлення"},
-            {image: "pin-blue-solid-15.png",title: "Звичайний день"}
+            {image: base + "pin-red-solid-15.png", title: "День оновлення"},
+            {image: base + "pin-yellow-solid-15.png", title: "День після оновлення"},
+            {image: base + "pin-blue-solid-15.png", title: "Звичайний день"}
         ];
-        var html = new EJS({url: 'templates/legend.ejs'}).render({base: base, icons: icons});
-        console.log(html);
+        var html = new EJS({url: 'templates/legend.ejs'}).render({icons: icons});
         var div = document.createElement('div');
         div.innerHTML = html;
         return div;
     };
-    this.add_legend = function(legend){
+    this.add_legend = function(legend) {
         this.map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legend);
     };
     this.set_shop_markers = function() {
@@ -43,23 +109,31 @@ function Second(shop, map) {
     var self = this;
     this.init = function(shop, map) {
         this.DAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-        this.icon_base = "images/google_maps_markers/cool/PNG/";
-        var marker_days = {
-            refresh_day: "pin-red-solid-15.png",
-            custom_day: "pin-blue-solid-15.png",
-            after_refresh_day: "pin-yellow-solid-15.png",
-        };
-        this.icons = this.set_icons(marker_days);
-        console.log(this.icons);
         this.shop = shop;
         this.position = {lng: shop.lng, lat: shop.lat};
         this.map = map;
         this.refresh_day = this.define_refresh_day();
+        this.sorted_days_by_freshness = this.sort_days_by_freshness();
+        console.log(this.sorted_days_by_freshness);
+        this.icon_base = "images/google_maps_markers/cool/PNG/";
+        var marker_days = null;
+        var trusted = {
+            refresh_day: "pin-red-solid-15.png",
+            custom_day: "pin-blue-solid-15.png",
+            after_refresh_day: "pin-yellow-solid-15.png",
+        };
+        var untrusted = {
+            refresh_day: "pin-red-15.png",
+            custom_day: "pin-blue-15.png",
+            after_refresh_day: "pin-yellow-15.png",
+        };
+        (shop.status) ? marker_days = trusted : marker_days = untrusted;
+        this.icons = this.set_icons(marker_days);
         var content = self.create_content();
         self.create_info_window(content);
     };
     this.set_icons = function(days) {
-        var icons =  Array.apply(null, new Array(7)).map(String.prototype.valueOf, days.custom_day);
+        var icons = Array.apply(null, new Array(7)).map(String.prototype.valueOf, days.custom_day);
         icons[0] = days.refresh_day;
         if (days.hasOwnProperty("after_refresh_day"))
             icons[1] = days.after_refresh_day;
@@ -79,10 +153,13 @@ function Second(shop, map) {
     };
     this.create_marker = function() {
         var icon = self.define_icon_for_marker();
+        var z_index = self.set_z_index_for_marker();
+        console.log("zIndex: " + z_index + " because refresh_day: " + this.refresh_day);
         var marker = new google.maps.Marker({
             map: self.map,
             position: self.position,
             icon: icon,
+            zIndex: z_index,
             animation: google.maps.Animation.DROP
         });
         self.marker = marker;
@@ -92,13 +169,41 @@ function Second(shop, map) {
         });
         return marker;
     };
-    this.define_icon_for_marker = function() {
-        var right = this.DAYS.slice(this.refresh_day);
-        var left = this.DAYS.slice(0, this.refresh_day);
-        var sorted_days_by_freshness = right.concat(left);
+    /**
+     * Порівнюємо індекси дня оновлення та поточного дня
+     * та виставляємо відповідно до цього zIndex
+     * @returns {undefined
+     */
+    this.set_z_index_for_marker = function(){
+         return 100 -  this.refresh_priority();
+    };
+    /**
+     * Визначає пріоритет оновлення секонда в поточний день
+     * Чим меньше число, тим свіжіший товар у секонді
+     * 0 - день оновлення
+     * 1 - день після оновлення
+     * 6 - останній день
+     * @returns {Number}
+     */
+    this.refresh_priority = function(){
         var today = new Date();
         var day_of_week = this.DAYS[today.getDay()];
-        var index = sorted_days_by_freshness.indexOf(day_of_week);
+        return this.sorted_days_by_freshness.indexOf(day_of_week);
+    };
+    this.sort_days_by_freshness = function(){
+        var right = this.DAYS.slice(this.refresh_day);
+        var left = this.DAYS.slice(0, this.refresh_day);
+        return right.concat(left);
+    };
+    /**
+     * refresh_day - 3 day of week (wed) 
+     * sorted_days_by_freshness - ["wed", "thu", 'fri", "sat", "sun", "mon", "tue"]
+     * today - 1 day of week (mon)
+     * 
+     */
+    this.define_icon_for_marker = function() {
+        var index = this.refresh_priority();
+        console.log("refresh priority: " + index);
         var icon = this.icon_base + this.icons[index];
         console.log("Today image is: " + icon + " because refresh day is: " + this.DAYS[this.refresh_day]);
         return icon;
@@ -119,9 +224,9 @@ function Second(shop, map) {
         });
         this.info_window = info_window;
         google.maps.event.addListener(this.info_window, 'domready', function() {
-            var days = $('td[data-day='+self.DAYS[self.refresh_day]+']').addClass('refreshDay');
+            var days = $('td[data-day=' + self.DAYS[self.refresh_day] + ']').addClass('refreshDay');
             var today = new Date().getDay();
-            $('td[data-day='+ self.DAYS[today] +']').addClass('today');
+            $('td[data-day=' + self.DAYS[today] + ']').addClass('today');
             //new RefreshDay(days);
         });
         return this.info_window;

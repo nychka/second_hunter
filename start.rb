@@ -57,9 +57,9 @@ class SecondHunter < Sinatra::Base
     settings = {}
     settings[:title] = params[:title] if params[:title].length > 3
     settings[:address] = params[:address]
-    location = geocode(settings[:address])
-    settings[:lng] = location["lng"]
-    settings[:lat] = location["lat"]
+    #location = geocode(settings[:address])
+    settings[:lng] = params["lng"]
+    settings[:lat] = params["lat"]
     settings[:monday] = days["monday"]
     settings[:tuesday] = days["tuesday"]
     settings[:wednesday] = days["wednesday"]
