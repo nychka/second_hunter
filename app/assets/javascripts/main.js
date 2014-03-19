@@ -10,6 +10,7 @@ $(document).ready(function() {
         $('#add_second_cancel').on('click', function() {
             aside.hide().removeClass('divider');
             map.removeClass('divider');
+            google_map.remove_add_second_marker();
         });
         $('#second_address').on('blur', function(){
            var city = $('#city option:selected').text();

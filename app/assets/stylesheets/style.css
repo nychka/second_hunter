@@ -94,3 +94,4 @@ body {
 input[data-role=day] {border-radius: 40px;}
 .legend {background-color: white; padding: 5px;}
 .divider {float: left; width: 49% !important;}
+#uLogin {padding: 15px;}

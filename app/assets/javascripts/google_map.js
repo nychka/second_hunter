@@ -11,13 +11,15 @@ function GoogleMap() {
         this.map = new google.maps.Map(document.getElementById("map-canvas"),
                 mapOptions);
         this.seconds = [];
-        this.second_show_time = 500;
+        this.second_show_time = 200;
         this.add_legend(this.create_legend());
+        this.icon_base = "images/google_maps_markers/cool/PNG/";
     };
     this.add_second_marker = function() {
         this.new_second_marker = new google.maps.Marker({
             map: self.map,
             position: self.position,
+            icon: self.icon_base + "pin-green-solid-13.png",
             draggable: true
         });
         google.maps.event.addListener(this.new_second_marker, "dragend", function() {
@@ -29,9 +31,9 @@ function GoogleMap() {
         //1. геокодуємо координати у вулицю
         self.get_address_from_lat_lng(lat, lng, function(address) {
             //2. записуємо вулицю в поле адреси
-            $('#second_address').val(address);
+            $('#second_address').val(address.formatted_address);
             //3. записуємо координати в приховані поля форми
-            self.set_hidden_lat_lng(lat,lng);
+            self.set_hidden_lat_lng(lat, lng);
         });
     };
     /*
@@ -54,29 +56,56 @@ function GoogleMap() {
         if (lat && lng) {
             $('#lat').val(lat);
             $('#lng').val(lng);
-        }else {throw new Error("Location isn't correct!");}
+        } else {
+            throw new Error("Location isn't correct!");
+        }
     };
     this.remove_add_second_marker = function() {
-        this.add_second_marker.setMap(null);
+        this.new_second_marker.setMap(null);
     };
     this.get_address_from_lat_lng = function(lat, lng, callback) {
 
         var latlng = new google.maps.LatLng(lat, lng);
         this.geocoder.geocode({'latLng': latlng}, function(results, status) {
             if (status == google.maps.GeocoderStatus.OK) {
-                if (results[0]) {
-                    //var infowindow = new google.maps.InfoWindow();
-                    //infowindow.setContent(results[1].formatted_address);
-                    //infowindow.open(self.map, self.new_second_marker);
-                    console.log(results);
-                    callback.call(self, results[0].formatted_address);
+                var results = results[0];
+                if (results) {
+                    //TODO: перевірка на прилягаємість до поточного міста
+                    if (results.types[0] === "street_address") {
+                        var street_number = results.address_components[0];
+                        var route = results.address_components[1];
+                        if (street_number.types[0] === "street_number" &&
+                                route.types[0] === "route") {
+                            street_number = street_number.long_name;
+                            route = route.long_name;
+
+                            var address = {street_number: street_number,
+                                street_name: route};
+                            address.formatted_address = address.street_name + "," + address.street_number;
+                            console.log(address);
+                            callback.call(self, address);
+                            return true;
+                        } else {
+                            alert("Address should have street number and street name!");
+                        }
+                    } else {
+                        alert("Address is not street!");
+                    }
                 }
             } else {
                 alert("Geocoder failed due to: " + status);
             }
         });
-    }
-
+        $('#second_address').val("");
+    };
+    //TODO: доробити
+    this.add_marker_to_legend = function() {
+        "<tr>\n\
+            <td><img src='#{self.new_second_marker.getIcon()}' /></td>\n\
+            <td>#{}</td>\n\
+        </tr>"
+        $('#legend tbody').append(marker);
+    };
     //TODO: добавляти нові елементи при різних умовах
     this.create_legend = function() {
         var base = "images/google_maps_markers/cool/PNG/";
@@ -174,8 +203,8 @@ function Second(shop, map) {
      * та виставляємо відповідно до цього zIndex
      * @returns {undefined
      */
-    this.set_z_index_for_marker = function(){
-         return 100 -  this.refresh_priority();
+    this.set_z_index_for_marker = function() {
+        return 100 - this.refresh_priority();
     };
     /**
      * Визначає пріоритет оновлення секонда в поточний день
@@ -185,12 +214,12 @@ function Second(shop, map) {
      * 6 - останній день
      * @returns {Number}
      */
-    this.refresh_priority = function(){
+    this.refresh_priority = function() {
         var today = new Date();
         var day_of_week = this.DAYS[today.getDay()];
         return this.sorted_days_by_freshness.indexOf(day_of_week);
     };
-    this.sort_days_by_freshness = function(){
+    this.sort_days_by_freshness = function() {
         var right = this.DAYS.slice(this.refresh_day);
         var left = this.DAYS.slice(0, this.refresh_day);
         return right.concat(left);
