@@ -2,9 +2,10 @@ $(document).ready(function() {
     var refresh_day = new RefreshDay($('input[data-role=day]'));
     var aside = $('#aside');
     var map = $('#map-canvas');
+    //TODO: повторний виклик форми!
     $('#add_second_hand').on('click', function() {
         var html = new EJS({url: 'templates/add_second.ejs'}).render({});
-        aside.show().html(html).addClass('divider')
+        aside.show().html(html).addClass('divider');
         map.addClass('divider');
         google_map.add_second_marker();
         $('#add_second_cancel').on('click', function() {

@@ -3,7 +3,7 @@ function GoogleMap() {
     this.init = function() {
         this.position = new google.maps.LatLng(48.887535, 24.707565);
         this.geocoder = new google.maps.Geocoder();
-
+        this.icon_base = "images/google_maps_markers/cool/PNG/";
         var mapOptions = {
             center: self.position,
             zoom: 12
@@ -13,7 +13,6 @@ function GoogleMap() {
         this.seconds = [];
         this.second_show_time = 200;
         this.add_legend(this.create_legend());
-        this.icon_base = "images/google_maps_markers/cool/PNG/";
     };
     this.add_second_marker = function() {
         this.new_second_marker = new google.maps.Marker({
@@ -22,6 +21,11 @@ function GoogleMap() {
             icon: self.icon_base + "pin-green-solid-13.png",
             draggable: true
         });
+        var icon = this.new_second_marker.getIcon();
+        var title = "Новий секонд";
+        var role = "new_second";
+        this.add_icon_to_legend(icon, title, role);
+        
         google.maps.event.addListener(this.new_second_marker, "dragend", function() {
             var pos = self.new_second_marker.getPosition();
             self.set_new_second_location(pos.lat(), pos.lng());
@@ -62,6 +66,8 @@ function GoogleMap() {
     };
     this.remove_add_second_marker = function() {
         this.new_second_marker.setMap(null);
+        //TODO: видалити іконку
+        $('.legend tr[data-role=new_second]').remove();
     };
     this.get_address_from_lat_lng = function(lat, lng, callback) {
 
@@ -99,20 +105,24 @@ function GoogleMap() {
         $('#second_address').val("");
     };
     //TODO: доробити
-    this.add_marker_to_legend = function() {
-        "<tr>\n\
-            <td><img src='#{self.new_second_marker.getIcon()}' /></td>\n\
-            <td>#{}</td>\n\
-        </tr>"
-        $('#legend tbody').append(marker);
+    this.add_icon_to_legend = function(icon, text, role) {
+
+        var html = new EJS({url: 'templates/legend_item.ejs'}).render({icon: icon, title: text, role: role});
+        $('.legend tbody').prepend(html);
+    };
+    this.test = function() {
+        var base = "images/google_maps_markers/cool/PNG/";
+        var html = new EJS({url: 'templates/test.ejs'}).render({icon: base + "pin-red-solid-15.png", title: "День оновлення"});
+        console.log(html);
     };
     //TODO: добавляти нові елементи при різних умовах
     this.create_legend = function() {
-        var base = "images/google_maps_markers/cool/PNG/";
+        var base = this.icon_base;
+        console.log(base);
         var icons = [
-            {image: base + "pin-red-solid-15.png", title: "День оновлення"},
-            {image: base + "pin-yellow-solid-15.png", title: "День після оновлення"},
-            {image: base + "pin-blue-solid-15.png", title: "Звичайний день"}
+            {image: base + "pin-red-solid-15.png", title: "День оновлення", role: "show_day"},
+            {image: base + "pin-yellow-solid-15.png", title: "День після оновлення", role: "show_day"},
+            {image: base + "pin-blue-solid-15.png", title: "Звичайний день", role: "show_day"}
         ];
         var html = new EJS({url: 'templates/legend.ejs'}).render({icons: icons});
         var div = document.createElement('div');
@@ -143,7 +153,6 @@ function Second(shop, map) {
         this.map = map;
         this.refresh_day = this.define_refresh_day();
         this.sorted_days_by_freshness = this.sort_days_by_freshness();
-        console.log(this.sorted_days_by_freshness);
         this.icon_base = "images/google_maps_markers/cool/PNG/";
         var marker_days = null;
         var trusted = {
