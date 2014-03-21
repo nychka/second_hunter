@@ -77,6 +77,21 @@
                 throw({type: 'EJS', message: 'There is no template at ' + url});
             }
             //this.name = url;
+        }else if (options.title && options.html) {
+            this.name = this.name ? this.name : options.title;
+            var template = EJS.get(this.name /*url*/, this.cache);
+            if (template)
+                return template;
+            if (template == EJS.INVALID_PATH)
+                return null;
+            try {
+                this.text = options.html;//EJS.request(url + (this.cache ? '' : '?' + Math.random()));
+            } catch (e) {
+            }
+
+            if (this.text == null) {
+                throw({type: 'EJS', message: 'There is no template at ' + url});
+            }
         }
         var template = new EJS.Compiler(this.text, this.type);
 

@@ -1,0 +1,14 @@
+<div class="legend">
+<table>
+    <% for(var i in icons){
+        var icon = icons[i].image,
+            title = icons[i].title,
+            role = icons[i].role,
+            html =  EJS.prototype.partial({url: 'templates/legend_item.ejs'},
+                                          {icon: icon, title: title, role: role}
+                                          ); 
+    %>
+      <%= html %>
+   <% } %>
+</table>
+</div>

@@ -1,0 +1,14 @@
+<div class="legend">
+<table>
+    <% for(var i in icons){
+        var icon = icons[i].image,
+            title = icons[i].title,
+            role = icons[i].role;
+ 	%>
+<tr data-role="<%= role %>">
+<td><img src="<%= icon %>" /><td>
+    <td><strong><%= title %></strong></td>
+</tr>
+   <% } %>
+</table>
+</div>

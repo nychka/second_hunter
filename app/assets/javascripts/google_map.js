@@ -3,6 +3,7 @@ function GoogleMap() {
     this.init = function() {
         this.position = new google.maps.LatLng(48.887535, 24.707565);
         this.geocoder = new google.maps.Geocoder();
+        //app.template = app.template;
         this.icon_base = "images/google_maps_markers/cool/PNG/";
         var mapOptions = {
             center: self.position,
@@ -25,7 +26,7 @@ function GoogleMap() {
         var title = "Новий секонд";
         var role = "new_second";
         this.add_icon_to_legend(icon, title, role);
-        
+
         google.maps.event.addListener(this.new_second_marker, "dragend", function() {
             var pos = self.new_second_marker.getPosition();
             self.set_new_second_location(pos.lat(), pos.lng());
@@ -106,14 +107,9 @@ function GoogleMap() {
     };
     //TODO: доробити
     this.add_icon_to_legend = function(icon, text, role) {
-
-        var html = new EJS({url: 'templates/legend_item.ejs'}).render({icon: icon, title: text, role: role});
+        var data = {icon: icon, title: text, role: role};
+        var html = app.template.render('legend_item', data);
         $('.legend tbody').prepend(html);
-    };
-    this.test = function() {
-        var base = "images/google_maps_markers/cool/PNG/";
-        var html = new EJS({url: 'templates/test.ejs'}).render({icon: base + "pin-red-solid-15.png", title: "День оновлення"});
-        console.log(html);
     };
     //TODO: добавляти нові елементи при різних умовах
     this.create_legend = function() {
@@ -124,7 +120,7 @@ function GoogleMap() {
             {image: base + "pin-yellow-solid-15.png", title: "День після оновлення", role: "show_day"},
             {image: base + "pin-blue-solid-15.png", title: "Звичайний день", role: "show_day"}
         ];
-        var html = new EJS({url: 'templates/legend.ejs'}).render({icons: icons});
+        var html = app.template.render('legend', {icons: icons});
         var div = document.createElement('div');
         div.innerHTML = html;
         return div;
@@ -253,7 +249,7 @@ function Second(shop, map) {
         }, time);
     };
     this.create_content = function() {
-        var html = new EJS({url: 'templates/second_hand.ejs'}).render(self.shop);
+        var html = app.template.render('second_hand', self.shop);
         return html;
     };
     this.create_info_window = function(content) {

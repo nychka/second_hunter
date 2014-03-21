@@ -36,11 +36,17 @@ class SecondHunter < Sinatra::Base
       end
       raise StandardError, "Partial was not found anywhere :("
     end
-    def partially(template)
-      p template
-      template = get_partial_according_to_user_role(template)
-      p template
-      erb(template)
+     def get_template_according_to_user_role(template)
+      p "user_role: #{session["user_role"]}"
+      user_role = session["user_role"] || 0
+      range = Range.new(0, user_role)
+      settings.user_roles.slice(range).reverse.each do |role|
+        partial = File.join("templates", role + "/#{template}")
+        path = File.expand_path(File.join(File.dirname(__FILE__), File.join(settings.root + 'assets', partial + ".ejs")))
+        p path
+        return File.open(path, "rb").read if File.exists? path
+      end
+      raise StandardError, "Partial was not found anywhere :("
     end
     def partial(template, *args)
       options = args.extract_options!
@@ -95,7 +101,6 @@ class SecondHunter < Sinatra::Base
     settings = {}
     settings[:title] = params[:title] if params[:title].length > 3
     settings[:address] = params[:address]
-    #location = geocode(settings[:address])
     settings[:lng] = params["lng"]
     settings[:lat] = params["lat"]
     settings[:monday] = days["monday"]
@@ -119,6 +124,12 @@ class SecondHunter < Sinatra::Base
   end
   get '/delay/:n' do |n|
     EM.add_timer(n.to_i) { body { "delayed for #{n} seconds" } }
+  end
+  get '/template/:name' do
+     path = get_template_according_to_user_role(params[:name])
+    p path
+    content_type 'text/plain', :charset => 'utf-8'
+    path
   end
   get '/partial/:name' do
     path = get_partial_according_to_user_role(params[:name])
