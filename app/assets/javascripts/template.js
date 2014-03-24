@@ -1,70 +1,51 @@
 function Template() {
     var self = this;
-    this.postfix = '_ejs';
     this.templates = [];
     this.init = function() {
         //initialize
-        console.log("hello");
     };
-    this.render = function(template, options){
-        var template = this.get(template);
-        var html = new EJS(template).render(options);
-        return html;
+    this.get = function(template, options) {
+        var data = null,
+            path = '/template/' + template,
+            promise = new Promise(function(resolve, reject) {
+            if (data = self.find(template)) {
+                resolve(self.ejs_render(data, options));
+            }else {
+                $.get(path).done(function(response) {
+                    self.save(template, response);
+                    console.log(self.templates);
+                    if (data = self.find(template)) {
+                        resolve(self.ejs_render(data, options));
+                    } else {
+                        reject("Template was not saved");
+                    }
+                }, function(err){
+                   reject(err);
+                });
+            }
+        });
+        return promise;
     };
-    this.append_to_DOM = function(template, html){
-        var id = template + this.postfix;
-        var div = $('<textarea></textarea>', {id: id});
-        div.val(html);
-        div.appendTo($('body'));
+    this.pre_load = function(template){
+        return this.get(template);
     };
-    /**
-     * Витягування шаблону
-     * @returns {undefined}
-     */
-    this.get = function(template) {
-        var template = this.find(template) || this.load(template);
-        if (!template)throw new Error("template was not found");
-        return template;
+    this.ejs_render = function(obj, options) {
+        if (!obj)throw new Error("Must be object");
+        if(options){
+            return new EJS(obj).render(options);
+        }else {
+            return new EJS(obj);
+        }
     };
     this.get_templates = function() {
         return this.templates;
     };
     this.find = function(template) {
-        var result = false;
-       this.templates.forEach(function(item) {
-            if (item.title === template) {
-                result = item;
-                return;
-            }
-        });
-        return result;
-    };
-    /**
-     * Завантажує шаблон і зберігає у сховищі
-     * @returns {undefined}
-     */
-    this.load = function(title, callback) {
-        var path = '/template/' + title;
-        var result = null;
-        try {
-            $.ajax({
-                url: path,
-                async: false,
-                success: function(html) {
-                    //console.log(html);
-                    self.save(title, html);
-                    if (callback)
-                        callback.call(self);
-                }
-            });
-            result = this.find(title);
-            return result;
-        } catch (e) {
-            console.log(e);
-            result =  false;
-        }finally {
-            return result;
+        for(var i in this.templates){
+            var item = this.templates[i];
+            if (item.title === template) return item;
         }
+        return false;
     };
     this.save = function(title, html) {
         var obj = {title: title, html: html};

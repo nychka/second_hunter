@@ -1,19 +1,17 @@
-<form method="GET" action="/add">
+<form id="add-second-form" method="GET" action="/add">
   <fieldset>
-    <legend>Add Second Hand</legend>
+    <legend>Добавити Секонд-Хенд</legend>
     <div class="form-group ">
-      <label for="second_title">Title</label>
+      <label for="second_title">Назва</label>
       <input type="text" id="second_title" name="title" placeholder="ЄвроСеконд" class="form-control" />
     </div>
     <div class="form-group ">
       <label for="city">Місто</label>
-        <select id="city">
-            <option name="city">Івано-Франківськ</option>
-        </select>
+        <input id="city" name="city" disabled required class="form-control" title="Вкажіть місто на карті" />
     </div>
     <div class="form-group ">
-      <label for="second_address">Address</label>
-      <input type="text" id="second_address" name="address" required placeholder="вул.Вовчинецька, 226" class="form-control" />
+      <label for="second_address">Вулиця</label>
+      <input type="text" id="second_address" name="address" required placeholder="Введіть вулицю або вкажіть на карті" class="form-control" />
     </div>
     <table class="table">
       <thead>
@@ -30,7 +28,7 @@
       </thead>
       <tbody>
         <tr>
-          <td>Ціна за 1 кг</td>
+          <td>грн/кг</td>
           <td>
             <input type="text" data-role="day"  name="days[monday]" required placeholder="00" class="form-control" />
           </td>
@@ -58,8 +56,8 @@
         <input type="hidden" name="lat" id="lat" />
         <input type="hidden" name="lng" id="lng" />
     <div class="form-actions">
-      <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Save</button>
-      <button type="button" class="btn" id="add_second_cancel">Cancel</button>
+      <button type="button" class="btn" id="add_second_cancel">Відміна</button>
+      <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span>Добавити</button>
     </div>
   </fieldset>
 </form>

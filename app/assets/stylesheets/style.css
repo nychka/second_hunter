@@ -1,24 +1,27 @@
 /* Space out content a bit */
 html, body { height: 100%;}
 body {
-    padding-top: 20px;
-    padding-bottom: 20px;
+    /*padding-top: 20px;*/
+    /*padding-bottom: 20px;*/
 }
 .navbar {
-  margin-bottom: 20px;
+  margin-bottom: 5px !important;
+}
+.navbar-default {
+    background-color: white !important;
 }
 
 /* Everything but the jumbotron gets side spacing for mobile first views */
 .header,
 .marketing,
 .footer {
-    padding-right: 15px;
-    padding-left: 15px;
+    /*padding-right: 15px;*/
+    /*padding-left: 15px;*/
 }
 
 /* Custom page header */
 .header {
-    border-bottom: 1px solid #e5e5e5;
+    /*border-bottom: 1px solid #e5e5e5;*/
 }
 /* Make the masthead heading the same height as the navigation */
 .header h3 {
@@ -47,9 +50,11 @@ body {
 
 /* Main marketing message and sign up button */
 .jumbotron {
-    text-align: center;
+    text-align: left;
     border-bottom: 1px solid #e5e5e5;
-    padding: 5px !important;
+    padding: 0px !important;
+    margin: 0px !important;
+    background: none !important;
 }
 .jumbotron .btn {
     padding: 14px 24px;
@@ -75,7 +80,7 @@ body {
     }
     /* Space out the masthead */
     .header {
-        margin-bottom: 30px;
+        /*margin-bottom: 30px;*/
     }
     /* Remove the bottom border on the jumbotron for visual effect */
     .jumbotron {
@@ -83,15 +88,74 @@ body {
     }
 }
 /* USER STYLE*/
-.jumbotron {height: 450px !important;}
+#content {padding: 10px 0px !important; margin: 0 auto 0 !important; height: 99%; width: 92%;}
+.jumbotron {height: 88% !important;}
 #map-canvas {width: 100%; height: 100%; position: relative;}
-#aside {display: none; position: relative;}
+#aside {
+    display: none; 
+    position: absolute;
+    width: 400px;
+    z-index: 1000;
+    opacity: 0.8;
+    margin: auto 0;
+}
 .refreshDay {
             font-weight: bold;
-            background-color: activecaption !important;
+            border: 3px solid darkred !important;
 }
-.today {background-color: yellow !important;}
+.today {background-color: whitesmoke !important;}
 input[data-role=day] {border-radius: 40px;}
 .legend {background-color: white; padding: 5px;}
 .divider {float: left; width: 49% !important;}
 #uLogin {padding: 15px;}
+#second-title .glyphicon, #second-title [data-name=title] {
+    font-size: 28px;
+    margin-left: 5px;
+    margin-right: 5px;
+    color: #ccc;
+    vertical-align: baseline;
+}
+#pencil {
+    /*vertical-align: top !important;*/
+    color: black !important;
+    font-size: 13px !important;
+}
+#add-second-form {
+    background: none repeat scroll 0 0 #F5F5F5;
+    padding: 10px;
+    text-align: center;
+}
+#add-second-form td {text-align: center; padding: 8px 0px !important;}
+.second-hand td, .second-hand th{vertical-align: middle !important; min-width: 60px;font-size: 14px; padding: 10px 0 !important;text-align: center !important;}
+.second-hand td > input {width: 60px; border-radius: 10px;}
+.second-hand {min-width: 550px; min-height: 280px;}
+.second-hand .glyphicon-ok:hover {color: green !important;}
+#trash, #save, #cancel {padding: 5px 10px 5px 10px  !important;margin-right: 10px;}
+#trash .glyphicon-trash, #save .glyphicon {font-size: 20px !important;}
+
+/*Search Box*/
+
+      #search-box {
+        background-color: #fff;
+        border-radius: 2px;
+        padding: 0 11px 0 13px;
+        width: 400px;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        text-overflow: ellipsis;
+        margin-left: 20px;
+        border: 1px solid transparent;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        height: 32px;
+        outline: none;
+        opacity: 0.5;
+        margin-top: 5px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      #search-box:focus {
+        border-color: #4d90fe;
+        opacity: 0.8;
+      }

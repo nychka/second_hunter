@@ -153,6 +153,25 @@ class SecondHunter < Sinatra::Base
     session.clear
     redirect to '/'
   end
+  post '/delete/second/:id' do
+    json Shop.destroy(params[:id])
+  end
+  post '/edit/second/status/:id' do
+    shop = Shop.find(params[:id])
+    p shop.status
+    (shop.status) ? shop.update(:status => false) : shop.update(:status => true)
+    json shop.status
+  end
+  post '/edit/second/:id' do
+    id = params[:id]
+    params.delete("splat")
+    params.delete("id")
+    params.delete("captures")
+    p params
+    shop = Shop.update(id, params)
+    json shop
+    #TODO: відіслати відповідь успішну або помилку
+  end
   post '/blank.html' do
     url = URI.parse('http://ulogin.ru/token.php?token='+params[:token]) 
     social_data = JSON.parse(Net::HTTP.get(url))

@@ -3,8 +3,8 @@ function GoogleMap() {
     this.init = function() {
         this.position = new google.maps.LatLng(48.887535, 24.707565);
         this.geocoder = new google.maps.Geocoder();
-        //app.template = app.template;
         this.icon_base = "images/google_maps_markers/cool/PNG/";
+        this.current_city = "Івано-Франківськ";
         var mapOptions = {
             center: self.position,
             zoom: 12
@@ -12,13 +12,45 @@ function GoogleMap() {
         this.map = new google.maps.Map(document.getElementById("map-canvas"),
                 mapOptions);
         this.seconds = [];
-        this.second_show_time = 200;
-        this.add_legend(this.create_legend());
+        this.create_legend().then(function(legend) {
+            self.add_legend(legend);
+        });
+        this.add_search_box();
+        this.add_footer_to_map();
+    };
+    this.add_footer_to_map = function() {
+        var input = document.getElementById('footer');
+        this.map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(input);
+    };
+    this.add_search_box = function() {
+        var input = document.createElement('input');
+        input.setAttribute('id', 'search-box');
+        input.setAttribute('placeholder', "Пошук міста");
+        this.map.controls[google.maps.ControlPosition.TOP_CENTER].push(input);
+        this.search_box = new google.maps.places.SearchBox((input));
+        google.maps.event.addListener(this.search_box, 'places_changed', function() {
+            var places = self.search_box.getPlaces();
+            console.log(places);
+            if (places.length !== 1) {
+                alert("Виберіть саме місто");
+            }
+            if (places.length === 1) {
+                var place = places[0];
+                if (place.types[0] === 'locality') { // <= should be ['locality', 'political']
+                    self.current_city = place.name; // <= "Івано-Франківськ"
+                    self.map.setCenter(place.geometry.location);
+                } else {
+                    alert("Виберіть саме місто");
+                }
+            }
+        });
+        return this.search_box;
     };
     this.add_second_marker = function() {
+        var position = this.map.getCenter();
         this.new_second_marker = new google.maps.Marker({
             map: self.map,
-            position: self.position,
+            position: position,
             icon: self.icon_base + "pin-green-solid-13.png",
             draggable: true
         });
@@ -39,6 +71,12 @@ function GoogleMap() {
             $('#second_address').val(address.formatted_address);
             //3. записуємо координати в приховані поля форми
             self.set_hidden_lat_lng(lat, lng);
+        }, function(err) {
+            console.log(err);
+            //1.Повертати маркер до поточного міста
+            //2.Очистити вулицю
+             $('#second_address').val("");
+            //3.Відкрити вікно на маркері з текстом про помилку
         });
     };
     /*
@@ -67,25 +105,58 @@ function GoogleMap() {
     };
     this.remove_add_second_marker = function() {
         this.new_second_marker.setMap(null);
-        //TODO: видалити іконку
         $('.legend tr[data-role=new_second]').remove();
     };
-    this.get_address_from_lat_lng = function(lat, lng, callback) {
+    this.find_city_from_results = function(results) {
+        console.log(results);
+        if (results && results.length) {
+            for (var i in results) {
+                var result = results[i], type = result.types[0];
+                if (type === 'locality') {
+                    var city = result.address_components[0].long_name;
+                    console.log("Found city: " + city);
+                    return city;
+                }
+            }
+            return false;
+        }else {
+            throw new Error("Bad results");
+        }
+    };
+    this.get_city_from_lat_lng = function(location, callback, errback) {
+        this.geocoder.geocode({'latLng': location}, function(results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                console.log(results);
+                var city = null;
+                if (city = self.find_city_from_results(results)) {
+                    callback.call(self, city);
+                    return true;
+                } else {
+                    errback(self, "City was not found");
+                }
+                return false;
+            }
+        });
+    };
+    this.get_address_from_lat_lng = function(lat, lng, callback, errback) {
 
         var latlng = new google.maps.LatLng(lat, lng);
         this.geocoder.geocode({'latLng': latlng}, function(results, status) {
             if (status == google.maps.GeocoderStatus.OK) {
-                var results = results[0];
-                if (results) {
-                    //TODO: перевірка на прилягаємість до поточного міста
-                    if (results.types[0] === "street_address") {
-                        var street_number = results.address_components[0];
-                        var route = results.address_components[1];
+                console.log(results);
+                if (results.length) {
+                    var result = results[0];
+                    if (result.types[0] === "street_address") {
+                        var street_number = result.address_components[0];
+                        var route = result.address_components[1];
                         if (street_number.types[0] === "street_number" &&
                                 route.types[0] === "route") {
                             street_number = street_number.long_name;
                             route = route.long_name;
-
+                            var city = self.find_city_from_results(results);
+                            if (city !== self.current_city) {
+                                errback.call(self, "City: " + city + " is not current city: " + self.current_city);
+                            }
                             var address = {street_number: street_number,
                                 street_name: route};
                             address.formatted_address = address.street_name + "," + address.street_number;
@@ -105,11 +176,12 @@ function GoogleMap() {
         });
         $('#second_address').val("");
     };
-    //TODO: доробити
     this.add_icon_to_legend = function(icon, text, role) {
         var data = {icon: icon, title: text, role: role};
-        var html = app.template.render('legend_item', data);
-        $('.legend tbody').prepend(html);
+        var template = app.template.get('legend_item', data).then(function(html) {
+            $('.legend tbody').prepend(html);
+        });
+        return template;
     };
     //TODO: добавляти нові елементи при різних умовах
     this.create_legend = function() {
@@ -120,24 +192,35 @@ function GoogleMap() {
             {image: base + "pin-yellow-solid-15.png", title: "День після оновлення", role: "show_day"},
             {image: base + "pin-blue-solid-15.png", title: "Звичайний день", role: "show_day"}
         ];
-        var html = app.template.render('legend', {icons: icons});
-        var div = document.createElement('div');
-        div.innerHTML = html;
-        return div;
+        var html = app.template.get('legend', {icons: icons}).then(function(html) {
+            var div = document.createElement('div');
+            div.innerHTML = html;
+            return div;
+        });
+        return html;
     };
     this.add_legend = function(legend) {
         this.map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legend);
     };
     this.set_shop_markers = function() {
-        $.get('/shops', function(shops) {
-            console.log(shops);
-            for (var i in shops) {
-                var second = new Second(shops[i], self.map);
-                second.show(i * self.second_show_time);
-                self.seconds.push(second);
-            }
+        return new Promise(function(resolve, reject) {
+            $.get('/shops').done(function(shops) {
+                for (var i in shops) {
+                    var second = new Second(shops[i], self.map);
+                    second.create_marker();
+                    self.seconds.push(second);
+                }
+                if (shops.length === self.seconds.length) {
+                    resolve(self.seconds);
+                } else {
+                    reject("Some seconds are missed!");
+                }
+            }, function(err) {
+                reject(err);
+            });
         });
     };
+    this.init();
 }
 ;
 function Second(shop, map) {
@@ -145,6 +228,7 @@ function Second(shop, map) {
     this.init = function(shop, map) {
         this.DAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
         this.shop = shop;
+        this.second_show_time = 200;
         this.position = {lng: shop.lng, lat: shop.lat};
         this.map = map;
         this.refresh_day = this.define_refresh_day();
@@ -163,8 +247,9 @@ function Second(shop, map) {
         };
         (shop.status) ? marker_days = trusted : marker_days = untrusted;
         this.icons = this.set_icons(marker_days);
-        var content = self.create_content();
-        self.create_info_window(content);
+        self.create_content().then(function(content) {
+            self.create_info_window(content);
+        });
     };
     this.set_icons = function(days) {
         var icons = Array.apply(null, new Array(7)).map(String.prototype.valueOf, days.custom_day);
@@ -179,7 +264,6 @@ function Second(shop, map) {
             days.push(self.shop[day]);
         });
         var max = Math.max.apply(Math, days);
-        console.log(max);
         var index = days.indexOf(max);
         if (days[index] !== max)
             throw Error;
@@ -197,7 +281,6 @@ function Second(shop, map) {
             animation: google.maps.Animation.DROP
         });
         self.marker = marker;
-        console.log(this.marker);
         google.maps.event.addListener(self.marker, 'click', function() {
             self.info_window.open(self.map, self.marker);
         });
@@ -243,13 +326,13 @@ function Second(shop, map) {
         return icon;
     };
     this.show = function(time) {
-        time = time || 0;
+        time = (time * self.second_show_time) || 0;
         setTimeout(function() {
             self.create_marker();
         }, time);
     };
     this.create_content = function() {
-        var html = app.template.render('second_hand', self.shop);
+        var html = app.template.get('second_hand', self.shop);
         return html;
     };
     this.create_info_window = function(content) {
@@ -258,9 +341,10 @@ function Second(shop, map) {
         });
         this.info_window = info_window;
         google.maps.event.addListener(this.info_window, 'domready', function() {
-            var days = $('td[data-day=' + self.DAYS[self.refresh_day] + ']').addClass('refreshDay');
+            console.log("inside second class");
+            var days = $('td[data-name=' + self.DAYS[self.refresh_day] + ']').addClass('refreshDay');
             var today = new Date().getDay();
-            $('td[data-day=' + self.DAYS[today] + ']').addClass('today');
+            $('td[data-name=' + self.DAYS[today] + ']').addClass('today');
             //new RefreshDay(days);
         });
         return this.info_window;
