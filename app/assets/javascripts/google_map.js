@@ -1,12 +1,12 @@
 function GoogleMap() {
     var self = this;
     this.init = function() {
-        this.position = new google.maps.LatLng(48.887535, 24.707565);
+        this.current_location = new google.maps.LatLng(48.887535, 24.707565);
         this.geocoder = new google.maps.Geocoder();
         this.icon_base = "images/google_maps_markers/cool/PNG/";
         this.current_city = "Івано-Франківськ";
         var mapOptions = {
-            center: self.position,
+            center: self.current_location,
             zoom: 12
         };
         this.map = new google.maps.Map(document.getElementById("map-canvas"),
@@ -38,13 +38,28 @@ function GoogleMap() {
                 var place = places[0];
                 if (place.types[0] === 'locality') { // <= should be ['locality', 'political']
                     self.current_city = place.name; // <= "Івано-Франківськ"
-                    self.map.setCenter(place.geometry.location);
+                    self.current_location = place.geometry.location;
+                    self.map.setCenter(self.current_location);
+                    var add_form = $('#add-second-form');
+                    if(add_form.length)add_form.find('#add_second_cancel').click();
                 } else {
                     alert("Виберіть саме місто");
                 }
             }
         });
         return this.search_box;
+    };
+    this.get_back_new_second_marker = function(){
+        if(!self.current_location instanceof google.maps.LatLng){
+            throw new Error("current location is undefined");
+            alert("current location is undefined");
+            return false;
+        }
+        if(this.new_second_marker && this.new_second_marker.map){
+            this.new_second_marker.setPosition(self.current_location);
+        }else {
+            alert('new second marker is undefined');
+        }
     };
     this.add_second_marker = function() {
         var position = this.map.getCenter();
@@ -74,8 +89,10 @@ function GoogleMap() {
         }, function(err) {
             console.log(err);
             //1.Повертати маркер до поточного міста
+            self.get_back_new_second_marker();
             //2.Очистити вулицю
              $('#second_address').val("");
+             self.map.setCenter(self.current_location);
             //3.Відкрити вікно на маркері з текстом про помилку
         });
     };
@@ -156,6 +173,7 @@ function GoogleMap() {
                             var city = self.find_city_from_results(results);
                             if (city !== self.current_city) {
                                 errback.call(self, "City: " + city + " is not current city: " + self.current_city);
+                                return false;
                             }
                             var address = {street_number: street_number,
                                 street_name: route};
@@ -183,7 +201,6 @@ function GoogleMap() {
         });
         return template;
     };
-    //TODO: добавляти нові елементи при різних умовах
     this.create_legend = function() {
         var base = this.icon_base;
         console.log(base);

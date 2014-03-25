@@ -152,14 +152,13 @@ $(document).ready(function() {
     });
     app.context.bind('click-add-second-button', function() {
         $('#add_second_hand').on('click', function() {
-            var city = $('#city').val(app.google_map.current_city);
             if (aside.is(":visible")) {
                 $('#add_second_cancel').click();
                 return false;
             }
             app.template.get('add_second', {}).then(function(html) {
-                aside.show().html(html);//.addClass('divider');
-                //map.addClass('divider');
+                aside.show().html(html);
+                $('#city').val(app.google_map.current_city);
                 app.google_map.add_second_marker();
                 $('#add_second_cancel').on('click', function() {
                     aside.hide().empty().removeClass('divider');
