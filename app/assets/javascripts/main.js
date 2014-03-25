@@ -60,7 +60,7 @@ $(document).ready(function() {
             console.log("saving");
             var data = form.serialize();
             console.log(data);
-            $.post(form.attr('action')).done(function(success) {
+            $.post(form.attr('action'), data).done(function(success) {
                 console.log(success);
             }, function(error) {
                 console.log(error);
@@ -127,13 +127,25 @@ $(document).ready(function() {
                     });
                 });
         // --- end star --- 
+      
+        var toggle_status = function(status){
+            if(status.hasClass('status-trusted')){
+                status.removeClass('status-trusted');
+            }else {
+                status.addClass('status-trusted');
+            }
+        };
         status.on('click', function() {
-            console.log('star');
+            toggle_status($(this));
             $.post('/edit/second/status/' + id).done(function(success) {
                 console.log(success);
             }, function(err) {
                 console.log(err);
             });
+        }).on('mouseenter', function(){
+            toggle_status($(this));
+        }).on('mouseleave', function(){
+            toggle_status($(this));
         });
 
         // --- trash ---

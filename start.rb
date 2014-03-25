@@ -110,6 +110,7 @@ class SecondHunter < Sinatra::Base
     settings[:friday] = days["friday"]
     settings[:saturday] = days["saturday"]
     settings[:sunday] = days["sunday"]
+    settings[:user_id] = session["user_id"]
     p settings
     Shop.create settings
     redirect to "/"
@@ -164,10 +165,10 @@ class SecondHunter < Sinatra::Base
   end
   post '/edit/second/:id' do
     id = params[:id]
+    p params
     params.delete("splat")
     params.delete("id")
     params.delete("captures")
-    p params
     shop = Shop.update(id, params)
     json shop
     #TODO: відіслати відповідь успішну або помилку

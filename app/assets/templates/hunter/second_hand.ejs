@@ -1,0 +1,44 @@
+<div class="second-hand">
+<form id="edit_second" data-second-id="<%=id%>" action="/edit/second/<%=id%>" method="POST">
+    <div id="second-title">
+               <span id="star" class="glyphicon glyphicon-star-empty pull-left"></span>
+               <span class="text-left pull-left" data-edit="true" data-name="title"><%= title %></span>
+              <% if(status){ %>
+                <span id="status" class="glyphicon glyphicon-ok status-trusted pull-left"></span>
+               <% }else { %>
+                <span id="status" class="glyphicon glyphicon-ok pull-left"></span>
+               <% } %>
+      </div>
+      <div class="clearfix"></div>
+     <h3 class="text-left"><%= address %></h3>
+ <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Пн</th>
+          <th>Вт</th>
+          <th>Ср</th>
+          <th>Чт</th>
+          <th>Пт</th>
+          <th>Сб</th>
+          <th>Нд</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>грн/кг</span></td>
+          <td data-role="day" data-edit="true" data-name="monday"><%= monday %></td>
+          <td data-role="day" data-edit="true" data-name="tuesday"><%= tuesday %></td>
+          <td data-role="day" data-edit="true" data-name="wednesday"><%= wednesday %></td>
+          <td data-role="day" data-edit="true" data-name="thursday"><%= thursday %></td>
+          <td data-role="day" data-edit="true" data-name="friday"><%= friday %> </td>
+          <td data-role="day" data-edit="true" data-name="saturday"><%= saturday %></td>
+          <td data-role="day" data-edit="true" data-name="sunday"><%= sunday %></td>
+        </tr>
+      </tbody>
+    </table>
+<button id="trash" data-second-id="<%=id%>" class="btn btn-default pull-left"><span class="glyphicon glyphicon-trash"></span></button>
+<button id="save" class="btn btn-primary pull-right"><span class="glyphicon glyphicon-floppy-disk"></span>Зберегти</button>
+<button id="cancel" class="btn btn-default pull-right"><span class="glyphicon"></span>Відмінити</button>
+</form>
+</div>

@@ -129,7 +129,8 @@ input[data-role=day] {border-radius: 40px;}
 .second-hand td, .second-hand th{vertical-align: middle !important; min-width: 60px;font-size: 14px; padding: 10px 0 !important;text-align: center !important;}
 .second-hand td > input {width: 60px; border-radius: 10px;}
 .second-hand {min-width: 550px; min-height: 280px;}
-.second-hand .glyphicon-ok:hover {color: green !important;}
+.second-hand .glyphicon-ok {}
+.status-trusted {color: green !important;}
 #trash, #save, #cancel {padding: 5px 10px 5px 10px  !important;margin-right: 10px;}
 #trash .glyphicon-trash, #save .glyphicon {font-size: 20px !important;}
 
