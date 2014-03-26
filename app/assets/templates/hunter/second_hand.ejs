@@ -1,3 +1,4 @@
+<% var id = _id.$oid %>
 <div class="second-hand">
 <form id="edit_second" data-second-id="<%=id%>" action="/edit/second/<%=id%>" method="POST">
     <div id="second-title">
@@ -10,7 +11,7 @@
                <% } %>
       </div>
       <div class="clearfix"></div>
-     <h3 class="text-left"><%= address %></h3>
+     <h3 class="text-left"><%= address.street %></h3>
  <table class="table">
       <thead>
         <tr>
@@ -27,17 +28,17 @@
       <tbody>
         <tr>
           <td>грн/кг</span></td>
-          <td data-role="day" data-edit="true" data-name="monday"><%= monday %></td>
-          <td data-role="day" data-edit="true" data-name="tuesday"><%= tuesday %></td>
-          <td data-role="day" data-edit="true" data-name="wednesday"><%= wednesday %></td>
-          <td data-role="day" data-edit="true" data-name="thursday"><%= thursday %></td>
-          <td data-role="day" data-edit="true" data-name="friday"><%= friday %> </td>
-          <td data-role="day" data-edit="true" data-name="saturday"><%= saturday %></td>
-          <td data-role="day" data-edit="true" data-name="sunday"><%= sunday %></td>
+          <td data-role="price" data-edit="true" data-name="monday"><%= price.monday %></td>
+          <td data-role="price" data-edit="true" data-name="tuesday"><%= price.tuesday %></td>
+          <td data-role="price" data-edit="true" data-name="wednesday"><%= price.wednesday %></td>
+          <td data-role="price" data-edit="true" data-name="thursday"><%= price.thursday %></td>
+          <td data-role="price" data-edit="true" data-name="friday"><%= price.friday %> </td>
+          <td data-role="price" data-edit="true" data-name="saturday"><%= price.saturday %></td>
+          <td data-role="price" data-edit="true" data-name="sunday"><%= price.sunday %></td>
         </tr>
       </tbody>
     </table>
-<button id="trash" data-second-id="<%=id%>" class="btn btn-default pull-left"><span class="glyphicon glyphicon-trash"></span></button>
+<button id="trash" data-second-id="<%=id %>" class="btn btn-default pull-left"><span class="glyphicon glyphicon-trash"></span></button>
 <button id="save" class="btn btn-primary pull-right"><span class="glyphicon glyphicon-floppy-disk"></span>Зберегти</button>
 <button id="cancel" class="btn btn-default pull-right"><span class="glyphicon"></span>Відмінити</button>
 </form>

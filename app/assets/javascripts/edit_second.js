@@ -1,53 +1,7 @@
 $(document).ready(function() {
-    var aside = $('#aside');
-    var map = $('#map-canvas');
-    window.app = {};
-    app.context = map;
-    app.template = new Template();
-    app.google_map = new GoogleMap();
-
-    /*google.maps.event.addListener(app.google_map.map, 'center_changed', function(){
-       console.log("center was changed");
-       var location = app.google_map.map.getCenter();
-        if(app.google_map.new_second_marker &&
-                app.google_map.new_second_marker.map){
-            app.google_map.new_second_marker.setPosition(location);
-        } 
-    });*/
-    google.maps.event.addListener(app.google_map.map, 'dragend', function() {
-        console.log("drag end");
-        
-        //2. Визначаємо місто по координатах
-        /*app.google_map.get_city_from_lat_lng(location, function(city) {
-            //3. Записуємо в поле місто у формі добавлення секонду
-            console.log(city);
-            if ($('#add-second-form')[0].length) {
-                $('#city').val(city);
-            }
-        });*/
-    });
-
-
-    app.template.pre_load('second_hand')
-            .then(app.google_map.set_shop_markers)
-            .then(function(seconds) {
-                seconds.forEach(function(second) {
-                    google.maps.event.addListener(second.info_window, 'domready', function() {
-                        app.context.trigger('second-info-window-is-opened');
-                    });
-                    google.maps.event.addListener(second.marker, 'click', function() {
-                        app.context.trigger('second-marker-is-clicked');
-                    });
-                });
-            });
-    app.template.pre_load('legend_item');
-    app.template.pre_load('add_second').then(function() {
-        app.context.trigger('click-add-second-button');
-    });
-    app.context.bind('second-info-window-is-opened', function() {
-        console.log("second-info-window-is-opened");
+    app.$context.bind('second-info-window-opened', function() {
         var form = $('#edit_second');
-        var id = parseInt(form.data('second-id'));
+        var id = form.data('second-id');
         var star = $('#star');
         var status = $('#status');
         var save = $('#save').hide();
@@ -95,6 +49,7 @@ $(document).ready(function() {
                         return false;
                     var val = $this.text();
                     var name = $this.data('name');
+                    ($this.data('role') === 'price') ? name = "price[" + name + "]" : name;
                     save.show();
                     cancel.show();
                     $this.text("");
@@ -127,11 +82,11 @@ $(document).ready(function() {
                     });
                 });
         // --- end star --- 
-      
-        var toggle_status = function(status){
-            if(status.hasClass('status-trusted')){
+
+        var toggle_status = function(status) {
+            if (status.hasClass('status-trusted')) {
                 status.removeClass('status-trusted');
-            }else {
+            } else {
                 status.addClass('status-trusted');
             }
         };
@@ -142,9 +97,9 @@ $(document).ready(function() {
             }, function(err) {
                 console.log(err);
             });
-        }).on('mouseenter', function(){
+        }).on('mouseenter', function() {
             toggle_status($(this));
-        }).on('mouseleave', function(){
+        }).on('mouseleave', function() {
             toggle_status($(this));
         });
 
@@ -161,28 +116,5 @@ $(document).ready(function() {
             console.log("I'm gonna destroy you " + id);
         });
         // --- end trash --- 
-    });
-    app.context.bind('click-add-second-button', function() {
-        $('#add_second_hand').on('click', function() {
-            if (aside.is(":visible")) {
-                $('#add_second_cancel').click();
-                return false;
-            }
-            app.template.get('add_second', {}).then(function(html) {
-                aside.show().html(html);
-                $('#city').val(app.google_map.current_city);
-                app.google_map.add_second_marker();
-                $('#add_second_cancel').on('click', function() {
-                    aside.hide().empty().removeClass('divider');
-                    map.removeClass('divider');
-                    app.google_map.remove_add_second_marker();
-                });
-                $('#second_address').on('blur', function() {
-                    var street = $(this).val();
-                    var address = street + "," + app.google_map.current_city + "," + "Україна";
-                    app.google_map.get_lat_lng_from_address(address);
-                });
-            });
-        });
     });
 });

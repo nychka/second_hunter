@@ -7,7 +7,7 @@
                <% } %>
       </div>
       <div class="clearfix"></div>
-     <h3 class="text-left"><%= address %></h3>
+     <h3 class="text-left"><%= address.street %></h3>
  <table class="table">
       <thead>
         <tr>
@@ -24,13 +24,13 @@
       <tbody>
         <tr>
           <td>грн/кг</span></td>
-          <td data-role="day" data-name="monday"><%= monday %></td>
-          <td data-role="day" data-name="tuesday"><%= tuesday %></td>
-          <td data-role="day" data-name="wednesday"><%= wednesday %></td>
-          <td data-role="day" data-name="thursday"><%= thursday %></td>
-          <td data-role="day" data-name="friday"><%= friday %> </td>
-          <td data-role="day" data-name="saturday"><%= saturday %></td>
-          <td data-role="day" data-name="sunday"><%= sunday %></td>
+          <td data-role="price" data-name="monday"><%= price.monday %></td>
+          <td data-role="price" data-name="tuesday"><%= price.tuesday %></td>
+          <td data-role="price" data-name="wednesday"><%= price.wednesday %></td>
+          <td data-role="price" data-name="thursday"><%= price.thursday %></td>
+          <td data-role="price" data-name="friday"><%= price.friday %> </td>
+          <td data-role="price" data-name="saturday"><%= price.saturday %></td>
+          <td data-role="price" data-name="sunday"><%= price.sunday %></td>
         </tr>
       </tbody>
     </table>

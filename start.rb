@@ -1,13 +1,9 @@
 require 'sinatra/base'
-require 'sinatra/activerecord'
 require 'sinatra/json'
-#require 'sinatra/async'
-#require "em-http-request"
 require 'net/http'
-require_relative 'db/database.rb'
+require_relative 'db/db.rb'
 
 class SecondHunter < Sinatra::Base
-  #register Sinatra::Async
   helpers Sinatra::JSON
   set :server, :thin
   set :sessions, true
@@ -36,7 +32,7 @@ class SecondHunter < Sinatra::Base
       end
       raise StandardError, "Partial was not found anywhere :("
     end
-     def get_template_according_to_user_role(template)
+    def get_template_according_to_user_role(template)
       p "user_role: #{session["user_role"]}"
       user_role = session["user_role"] || 0
       range = Range.new(0, user_role)
@@ -87,32 +83,29 @@ class SecondHunter < Sinatra::Base
   end
   get '/' do
     @title = "Second Hunter - for real clothes hunters!"
+    if (session['user_role'] && session['user_role'] == 2)
+      @user_can_edit_second = true 
+    end
     @user = {}
     @user[:id] = session['user_id'] if session['user_id']
     @user[:name] = session['first_name'] if session['first_name']
     erb :index
   end
-  get '/new' do
-    erb :new
-  end
   get '/add' do
-    days = params[:days]
-    raise StandardError, "Not all days were passed" unless days.count == 7
-    settings = {}
-    settings[:title] = params[:title] if params[:title].length > 3
-    settings[:address] = params[:address]
-    settings[:lng] = params["lng"]
-    settings[:lat] = params["lat"]
-    settings[:monday] = days["monday"]
-    settings[:tuesday] = days["tuesday"]
-    settings[:wednesday] = days["wednesday"]
-    settings[:thursday] = days["thursday"]
-    settings[:friday] = days["friday"]
-    settings[:saturday] = days["saturday"]
-    settings[:sunday] = days["sunday"]
-    settings[:user_id] = session["user_id"]
-    p settings
-    Shop.create settings
+    price = params[:price]
+    p params
+    raise StandardError, "Not all days were passed" unless price.count == 7
+    raise StandardError, "user_id is not defined in session" unless session["user_id"]
+    title = {:title => params[:title]} if params[:title].length > 3
+    address = params[:address]
+    
+    user = User.find(session["user_id"])
+    raise StandardError, "User not found" if user.nil?
+    shop = Shop.new(title) if user
+    shop.create_address(address) if shop
+    shop.create_price(price) if shop
+    user.shops << shop
+    
     redirect to "/"
   end
   get '/shop/:id' do
@@ -123,24 +116,11 @@ class SecondHunter < Sinatra::Base
     @shop = Shop.all
     json @shop
   end
-  get '/delay/:n' do |n|
-    EM.add_timer(n.to_i) { body { "delayed for #{n} seconds" } }
-  end
   get '/template/:name' do
-     path = get_template_according_to_user_role(params[:name])
+    path = get_template_according_to_user_role(params[:name])
     p path
     content_type 'text/plain', :charset => 'utf-8'
     path
-  end
-  get '/partial/:name' do
-    path = get_partial_according_to_user_role(params[:name])
-    p path
-    body {path}
-  end
-  
-  get '/geocode/:address' do
-    location = geocode(params[:address])
-    body{location.to_s}
   end
   get '/profile' do
     p session
@@ -155,7 +135,7 @@ class SecondHunter < Sinatra::Base
     redirect to '/'
   end
   post '/delete/second/:id' do
-    json Shop.destroy(params[:id])
+    json Shop.find(params[:id]).delete
   end
   post '/edit/second/status/:id' do
     shop = Shop.find(params[:id])
@@ -165,11 +145,15 @@ class SecondHunter < Sinatra::Base
   end
   post '/edit/second/:id' do
     id = params[:id]
+    title = params[:title]
+    price = params[:price]
     p params
     params.delete("splat")
     params.delete("id")
     params.delete("captures")
-    shop = Shop.update(id, params)
+    shop = Shop.find(id)
+    shop.update(:title => title) if title
+    shop.price.update(price) if price
     json shop
     #TODO: відіслати відповідь успішну або помилку
   end
@@ -177,8 +161,8 @@ class SecondHunter < Sinatra::Base
     url = URI.parse('http://ulogin.ru/token.php?token='+params[:token]) 
     social_data = JSON.parse(Net::HTTP.get(url))
     p social_data
-    @user = User.find_by_email(social_data['email']) if (social_data['email'])
-    @user = User.find_by_identity(social_data['identity']) unless @user
+    @user = User.find_by(:email => social_data['email']) if (social_data['email'])
+    @user = User.find_by(:identity => social_data['identity']) unless @user
     unless @user
       @user = User.new
       @user.first_name = social_data['first_name']
