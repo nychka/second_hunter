@@ -1,2 +1,0 @@
-Shop.create(:address => 'Вовчинецька, 189')
-
