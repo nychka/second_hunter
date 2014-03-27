@@ -27,11 +27,7 @@ $(document).ready(function() {
     app.template.pre_load('second_hand')
             .then(app.google_map.get_seconds)
             .then(function(seconds) {
-                seconds.forEach(function(second) {
-                    google.maps.event.addListener(second.info_window, 'domready', function() {
-                        app.$context.trigger('second-info-window-opened');
-                    });
-                });
+                app.alert("Кіл-ть секондів - " + seconds.length + " завантажено!");
             });
     app.template.pre_load('legend_item');
     app.template.pre_load('add_second').then(function() {
@@ -41,6 +37,13 @@ $(document).ready(function() {
     });
     app.$context.bind('second-info-window-opened', function() {
         console.log("second-info-window-opened");
+    });
+    app.$context.bind('close-add-second-form', function(){
+        if (app.$aside.is(":visible")) {
+            app.$aside.find($('#add_second_cancel')).click();
+            return true;
+        }
+        throw new Error("You're trying to close form, but it's not opened!");
     });
     app.$context.bind('click-add-second-button', function() {
         if (app.$aside.is(":visible")) {
@@ -53,7 +56,7 @@ $(document).ready(function() {
             app.google_map.add_second_marker();
             $('#add_second_cancel').on('click', function() {
                 app.$aside.hide().empty();
-                app.google_map.remove_add_second_marker();
+                app.google_map.remove_new_second_marker();
             });
             $('#second_address').on('mouseleave blur', function() {
                 var street = $(this).val();
@@ -69,7 +72,7 @@ $(document).ready(function() {
                    console.log(response);
                    if(response.status === "ok"){
                        app.alert(response.message);
-                       //TODO: добавити маркер на мапу
+                       app.google_map.add_second(response.data);
                    }else {
                        app.alert(response.message, "error");
                    }

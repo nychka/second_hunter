@@ -19,6 +19,38 @@ function GoogleMap() {
         this.add_search_box();
         this.add_footer_to_map();
     };
+    this.replace_second = function(id, new_second){
+      for(var i in this.seconds[this.current_city]){
+          var second = this.seconds[this.current_city][i];
+          if(second.id === id){
+              second.remove_marker();
+              new_second = new Second(new_second, self.map);
+              new_second.create_marker();
+              self.seconds[self.current_city][i] = new_second;
+              return true;
+          }
+      }
+      return false;
+    };
+    this.remove_second = function(id){
+        var arr = self.seconds[self.current_city];
+        arr = _.reject(arr, function(second) { 
+            if(second.id === id){
+                second.remove_marker();
+                return true;
+            }
+        });
+        if(self.seconds[self.current_city].length - arr.length !== 1){
+            throw new Error('second was not removed');
+        }
+        return self.seconds[self.current_city] = arr;
+    };
+    this.add_second = function(shop) {
+        var second = new Second(shop, this.map);
+        self.seconds[self.current_city].push(second);
+        app.$context.trigger('close-add-second-form');
+        second.create_marker();
+    };
     this.add_footer_to_map = function() {
         var input = document.getElementById('footer');
         this.map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(input);
@@ -41,12 +73,7 @@ function GoogleMap() {
                     self.current_location = place.geometry.location;
                     self.map.setCenter(self.current_location);
                     self.get_seconds().then(function(seconds) {
-                        console.log(seconds);
-                        seconds.forEach(function(second){
-                             google.maps.event.addListener(second.info_window, 'domready', function() {
-                                app.$context.trigger('second-info-window-opened');
-                            });
-                        });
+                        app.alert("Кіл-ть секондів - " + seconds.length + " завантажено!");
                     });
                     var add_form = $('#add-second-form');
                     if (add_form.length)
@@ -79,7 +106,7 @@ function GoogleMap() {
             draggable: true
         });
         var icon = this.new_second_marker.getIcon();
-        var title = "Новий секонд";
+        var title = "Новий";
         var role = "new_second";
         this.add_icon_to_legend(icon, title, role);
 
@@ -132,7 +159,7 @@ function GoogleMap() {
             throw new Error("Location isn't correct!");
         }
     };
-    this.remove_add_second_marker = function() {
+    this.remove_new_second_marker = function() {
         this.new_second_marker.setMap(null);
         $('.legend tr[data-role=new_second]').remove();
     };
@@ -220,9 +247,10 @@ function GoogleMap() {
     this.create_legend = function() {
         var base = this.icon_base;
         var icons = [
-            {image: base + "pin-red-solid-15.png", title: "День оновлення", role: "show_day"},
-            {image: base + "pin-yellow-solid-15.png", title: "День після оновлення", role: "show_day"},
-            {image: base + "pin-blue-solid-15.png", title: "Звичайний день", role: "show_day"}
+            {image: base + "pin-red-solid-15.png", title: "в день оновлення", role: "show_day"},
+            {image: base + "pin-yellow-solid-15.png", title: "в день після оновлення", role: "show_day"},
+            {image: base + "pin-blue-solid-15.png", title: "в будний день", role: "show_day"},
+            {image: base + "pin-blue-15.png", title: "непідтверджений", role: "show_status"}
         ];
         var html = app.template.get('legend', {icons: icons}).then(function(html) {
             var div = document.createElement('div');
@@ -242,7 +270,6 @@ function GoogleMap() {
             } else {
                 $.get('/shops/' + self.current_city).done(function(response) {
                     if (response.status === 'ok') {
-                        app.alert(response.message);
                         var shops = response.data;
                         var seconds = [];
                         for (var i in shops) {
@@ -254,12 +281,8 @@ function GoogleMap() {
                             }
                             seconds.push(second);
                         }
-                        console.log(shops.length);
-                        console.log(seconds.length);
                         self.seconds[self.current_city] = seconds;
                         if (shops.length === seconds.length) {
-                            //self.seconds[self.current_city] = seconds;
-                            app.alert("Секонди успішно завантажені!");
                             resolve(self.seconds[self.current_city]);
                         } else {
                             app.alert("Сталась помилка під час завантаження секондів!", "error");

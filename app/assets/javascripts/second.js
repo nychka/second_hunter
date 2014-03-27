@@ -3,6 +3,7 @@ function Second(shop, map) {
     this.init = function(shop, map) {
         this.DAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
         this.shop = shop;
+        this.id = this.shop["_id"]["$oid"];
         this.second_show_time = 200;
         this.position = {lng: shop.address.lng, lat: shop.address.lat};
         this.map = map;
@@ -25,6 +26,9 @@ function Second(shop, map) {
         self.create_content().then(function(content) {
             self.create_info_window(content);
         });
+    };
+    this.remove_marker = function(){
+        this.marker.setMap(null);
     };
     this.set_icons = function(days) {
         var icons = Array.apply(null, new Array(7)).map(String.prototype.valueOf, days.custom_day);
@@ -120,6 +124,7 @@ function Second(shop, map) {
             var today = new Date().getDay();
             $('td[data-name=' + self.DAYS[today] + ']').addClass('today');
             //new RefreshDay(days);
+            app.$context.trigger('second-info-window-opened');
         });
         return this.info_window;
     };

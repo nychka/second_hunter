@@ -9,16 +9,15 @@ $(document).ready(function() {
         var input = $('<input />', {type: 'text', class: 'form-control'});
         var pencil = $('<span></span>', {id: 'pencil', class: 'glyphicon glyphicon-pencil'});
         var edittable = $('[data-edit=true]');
-        save.on('click', function(e) {
+        save.off().on('click', function(e) {
             e.preventDefault();
-            console.log("saving");
             var data = form.serialize();
-            console.log(data);
             $.post(form.attr('action'), data).done(function(response) {
-                if(response.status === "ok"){
+                if (response.status === "ok") {
+                    //1. замінити оновлені поля або сам маркер
+                    app.google_map.replace_second(id, response.data);
                     app.alert("Секонд-хенд успішно оновлений");
-                    console.log(response.data);
-                }else {
+                } else {
                     app.alert(response.message, "error");
                 }
             }).fail(function(error) {
@@ -26,7 +25,7 @@ $(document).ready(function() {
                 console.log(error);
             });
         });
-        cancel.on('click', function(e) {
+        cancel.off().on('click', function(e) {
             e.preventDefault();
             edittable.find('input').each(function() {
                 var input = $(this);
@@ -38,7 +37,7 @@ $(document).ready(function() {
             save.hide();
         });
 
-        edittable.on('mouseenter', function() {
+        edittable.off().on('mouseenter', function() {
             if ($(this).is('input') || $(this).has('input').length)
                 return false;
             $(this).append(pencil);
@@ -72,7 +71,7 @@ $(document).ready(function() {
             star_enter_class = 'glyphicon-star';
             star_leave_class = 'glyphicon-star-empty';
         }
-        star
+        star.off()
                 .on('mouseenter', function() {
                     $(this).removeClass(star_leave_class).addClass(star_enter_class);
                 })
@@ -80,12 +79,10 @@ $(document).ready(function() {
                     $(this).removeClass(star_enter_class).addClass(star_leave_class);
                 })
                 .on('click', function() {
-                    console.log('star');
                     $.post('/add/star/' + id).done(function(response) {
-                         console.log(response);
-                        if(response.status === "ok"){
+                        if (response.status === "ok") {
                             app.alert(response.message);
-                        }else {
+                        } else {
                             app.alert(response.message, "error");
                         }
                     }).fail(function(error) {
@@ -102,13 +99,13 @@ $(document).ready(function() {
                 status.addClass('status-trusted');
             }
         };
-        status.on('click', function() {
+        status.off().on('click', function() {
             toggle_status($(this));
             $.post('/edit/second/status/' + id).done(function(response) {
-                console.log(response);
-                if(response.status === "ok"){
+                if (response.status === "ok") {
+                    app.google_map.replace_second(id, response.data);
                     app.alert(response.message);
-                }else {
+                } else {
                     app.alert(response.message, "error");
                 }
             }).fail(function(error) {
@@ -122,22 +119,22 @@ $(document).ready(function() {
         });
 
         // --- trash ---
-        $('#trash').on('click', function(e) {
+        $('#trash').off().on('click', function(e) {
             e.preventDefault();
             if (!confirm("Ви дійсно хочете видалити секонд-хенд?"))
                 return false;
             $.post('/delete/second/' + id).done(function(response) {
                 console.log(response);
-                if(response.status === "ok"){
-                    app.alert(response.message);
-                }else {
+                if (response.status === "ok") {
+                    if (app.google_map.remove_second(id))
+                        app.alert(response.message);
+                } else {
                     app.alert(response.message, "error");
                 }
             }).fail(function(error) {
                 app.alert("Помилка при видалені: " + error.status + " - " + error.statusText, "error");
                 console.log(error);
             });
-            console.log("I'm gonna destroy you " + id);
         });
         // --- end trash --- 
     });

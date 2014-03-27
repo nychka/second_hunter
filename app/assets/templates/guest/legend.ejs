@@ -1,5 +1,11 @@
 <div class="legend">
 <table>
+<thead>
+<tr>
+<th collspan=2>Секонд</th>
+</tr>
+</thead>
+<tbody>
     <% for(var i in icons){
         var icon = icons[i].image,
             title = icons[i].title,
@@ -10,5 +16,6 @@
     <td><strong><%= title %></strong></td>
 </tr>
    <% } %>
+</tbody>
 </table>
 </div>

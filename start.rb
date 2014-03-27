@@ -152,7 +152,7 @@ class SecondHunter < Sinatra::Base
     p shop.status
     (shop && shop.status) ? shop.update(:status => false) : shop.update(:status => true)
     #json shop.status
-    send_response(shop.status, "Статус секонда успішно змінений", "Сталась помилка при зміні статусу")
+    send_response(shop, "Статус секонда успішно змінений", "Сталась помилка при зміні статусу")
   end
   post '/edit/second/:id' do
     id = params[:id]
