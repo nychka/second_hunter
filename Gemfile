@@ -3,8 +3,9 @@ ruby "2.0.0"
 
 gem "sinatra", :require => 'sinatra/base'
 gem "thin"
+gem "rake"
 gem "sinatra-contrib"
-gem 'mongoid', '~> 4.0.0.beta1', :github => 'mongoid/mongoid'
+gem 'mongoid', :github => 'mongoid/mongoid'
 gem "bson_ext"
 gem "json"
  

@@ -13,7 +13,7 @@ class SecondHunter < Sinatra::Base
   configure do
     set :threaded, true
     set :root, "app/"
-    set :public_folder, Proc.new { File.join(root, "assets") }
+    set :public_folder, Proc.new { File.join(settings.root, "assets") }
     set :session_secret, "second_hunter"
     set :partial_folder, "partials/"
     set :user_roles, ["guest", "user", "hunter"]
@@ -192,5 +192,3 @@ class SecondHunter < Sinatra::Base
     redirect to '/'
   end
 end
-
-#SecondHunter.run!
