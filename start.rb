@@ -103,6 +103,7 @@ class SecondHunter < Sinatra::Base
     erb :index
   end
   post '/add' do
+    halt "Спочатку ввійдіть в систему" unless session["user_id"]
     price = params[:price]
     p params
     raise StandardError, "Not all days were passed" unless price.count == 7

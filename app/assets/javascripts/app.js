@@ -66,7 +66,6 @@ $(document).ready(function() {
                e.preventDefault();
                var data = $(this).serialize();
                var action = $(this).attr('action');
-               console.log(data);
                $.post(action, data)
                  .done(function(response){
                    console.log(response);
@@ -74,7 +73,7 @@ $(document).ready(function() {
                        app.alert(response.message);
                        app.google_map.add_second(response.data);
                    }else {
-                       app.alert(response.message, "error");
+                       app.alert(response || response.message, "error");
                    }
                }).fail(function(error){
                    console.log(error);
