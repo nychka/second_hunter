@@ -12,7 +12,7 @@ function GoogleMap() {
         };
         this.map = new google.maps.Map(document.getElementById("map-canvas"),
                 mapOptions);
-        this.seconds = [];
+        this.seconds = {};
         this.create_legend().then(function(legend) {
             self.add_legend(legend);
         });
@@ -32,7 +32,7 @@ function GoogleMap() {
         google.maps.event.addListener(this.search_box, 'places_changed', function() {
             var places = self.search_box.getPlaces();
             if (places.length !== 1) {
-                alert("Виберіть саме місто");
+                app.alert("Виберіть тільки місто", "warning");
             }
             if (places.length === 1) {
                 var place = places[0];
@@ -40,11 +40,19 @@ function GoogleMap() {
                     self.current_city = place.name; // <= "Івано-Франківськ"
                     self.current_location = place.geometry.location;
                     self.map.setCenter(self.current_location);
+                    self.get_seconds().then(function(seconds) {
+                        console.log(seconds);
+                        seconds.forEach(function(second){
+                             google.maps.event.addListener(second.info_window, 'domready', function() {
+                                app.$context.trigger('second-info-window-opened');
+                            });
+                        });
+                    });
                     var add_form = $('#add-second-form');
                     if (add_form.length)
                         add_form.find('#add_second_cancel').click();
                 } else {
-                    alert("Виберіть саме місто");
+                    app.alert("Виберіть тільки місто", "warning");
                 }
             }
         });
@@ -53,13 +61,13 @@ function GoogleMap() {
     this.get_back_new_second_marker = function() {
         if (!self.current_location instanceof google.maps.LatLng) {
             throw new Error("current location is undefined");
-            alert("current location is undefined");
+            app.alert("current location is undefined", "error");
             return false;
         }
         if (this.new_second_marker && this.new_second_marker.map) {
             this.new_second_marker.setPosition(self.current_location);
         } else {
-            alert('new second marker is undefined');
+            app.alert('new second marker is undefined', "error");
         }
     };
     this.add_second_marker = function() {
@@ -89,6 +97,7 @@ function GoogleMap() {
             self.set_hidden_lat_lng(lat, lng);
         }, function(err) {
             console.log(err);
+            app.alert(err, "warning");
             //1.Повертати маркер до поточного міста
             self.get_back_new_second_marker();
             //2.Очистити вулицю
@@ -110,7 +119,8 @@ function GoogleMap() {
                 self.new_second_marker.setPosition(location);
                 self.set_hidden_lat_lng(location.lat(), location.lng());
             } else {
-                alert("Geocode was not successful for the following reason: " + status);
+                console.log("Geocode was not successful for the following reason: " + status);
+                app.alert("Geocode problem: " + status, "error");
             }
         });
     };
@@ -146,11 +156,13 @@ function GoogleMap() {
         this.geocoder.geocode({'latLng': location}, function(results, status) {
             if (status == google.maps.GeocoderStatus.OK) {
                 //console.log(results);
-                var city = null;
-                if (city = self.find_city_from_results(results)) {
+                var city = self.find_city_from_results(results)
+                if (city) {
+                    app.alert("Місто " + сity + " знайдено");
                     callback.call(self, city);
                     return true;
                 } else {
+                    app.alert("Місто не було знайдено", "warning");
                     errback(self, "City was not found");
                 }
                 return false;
@@ -173,7 +185,9 @@ function GoogleMap() {
                             street_number = street_number.long_name;
                             route = route.long_name;
                             var city = self.find_city_from_results(results);
+                            console.log(city);
                             if (city !== self.current_city) {
+                                app.alert("Ви вийшли за межі міста!", "warning");
                                 errback.call(self, "City: " + city + " is not current city: " + self.current_city);
                                 return false;
                             }
@@ -184,14 +198,14 @@ function GoogleMap() {
                             callback.call(self, address);
                             return true;
                         } else {
-                            alert("Address should have street number and street name!");
+                            app.alert("Адреса повинна містити вулицю та будинок", "warning");
                         }
                     } else {
-                        alert("Address is not street!");
+                        app.alert("Адреса не є вулицею", "warning");
                     }
                 }
             } else {
-                alert("Geocoder failed due to: " + status);
+                app.alert("Geocoder failed due to: " + status, "error");
             }
         });
         $('#second_address').val("");
@@ -220,22 +234,47 @@ function GoogleMap() {
     this.add_legend = function(legend) {
         this.map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legend);
     };
-    this.set_shop_markers = function() {
+    this.get_seconds = function() {
         return new Promise(function(resolve, reject) {
-            $.get('/shops').done(function(shops) {
-                for (var i in shops) {
-                    var second = new Second(shops[i], self.map);
-                    second.create_marker();
-                    self.seconds.push(second);
-                }
-                if (shops.length === self.seconds.length) {
-                    resolve(self.seconds);
-                } else {
-                    reject("Some seconds are missed!");
-                }
-            }, function(err) {
-                reject(err);
-            });
+            if (self.seconds[self.current_city]) {
+                console.log(self.seconds[self.current_city]);
+                resolve(self.seconds[self.current_city]);
+            } else {
+                $.get('/shops/' + self.current_city).done(function(response) {
+                    if (response.status === 'ok') {
+                        app.alert(response.message);
+                        var shops = response.data;
+                        var seconds = [];
+                        for (var i in shops) {
+                            try {
+                                var second = new Second(shops[i], self.map);
+                                second.create_marker();
+                            } catch (e) {
+                                console.log(e);
+                            }
+                            seconds.push(second);
+                        }
+                        console.log(shops.length);
+                        console.log(seconds.length);
+                        self.seconds[self.current_city] = seconds;
+                        if (shops.length === seconds.length) {
+                            //self.seconds[self.current_city] = seconds;
+                            app.alert("Секонди успішно завантажені!");
+                            resolve(self.seconds[self.current_city]);
+                        } else {
+                            app.alert("Сталась помилка під час завантаження секондів!", "error");
+                            reject("Some seconds are missed!");
+                        }
+                    } else {
+                        console.log(response.message);
+                        app.alert(response.message, "error");
+                    }
+                }).fail(function(error) {
+                    console.log(error);
+                    app.alert("Помилка при завантажені: " + error.status + " - " + error.statusText, "error");
+                    reject(error);
+                });
+            }
         });
     };
     this.init();

@@ -23,6 +23,14 @@ class Shop
 	embeds_one :price
   field :title, :type => String, :default => "Second Hand"
 	field :status, :type => Boolean, :default => false
+  
+  def self.find_by_city(city)
+    results = []
+    Shop.all.entries.each do |shop|
+      results << shop if (shop.address.city == city)
+    end
+    results
+  end
 end
 class Address
 	include Mongoid::Document

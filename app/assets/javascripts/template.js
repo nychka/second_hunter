@@ -13,13 +13,12 @@ function Template() {
             }else {
                 $.get(path).done(function(response) {
                     self.save(template, response);
-                    console.log(self.templates);
                     if (data = self.find(template)) {
                         resolve(self.ejs_render(data, options));
                     } else {
                         reject("Template was not saved");
                     }
-                }, function(err){
+                }).fail(function(err){
                    reject(err);
                 });
             }
@@ -56,6 +55,7 @@ function Template() {
                 throw new Error("Error while adding new template");
         } catch (e) {
             console.log(e);
+            app.alert(e.message, "error");
         }
     };
     this.init();

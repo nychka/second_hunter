@@ -48,7 +48,7 @@ class SecondHunter < Sinatra::Base
       options = args.extract_options!
       options.merge!(:layout => false)
       template = get_partial_according_to_user_role(template)
-        p template
+      p template
       if collection = options.delete(:collection) then
         collection.inject([]) do |buffer, member|
           buffer << erb(template, options.merge(:layout =>
@@ -57,6 +57,17 @@ class SecondHunter < Sinatra::Base
       else
         erb(template, options)
       end
+    end
+    def send_response(data,success,error)
+      unless(data.nil?)
+        status = "ok"
+        message = success
+      else
+        status = "error"
+        message = error
+      end
+      content_type 'application/json'
+      {:status => status,:message => message, :data =>data}.to_json
     end
     def geocode(address)
       raise ArgumentError, "Address is NOT passed!" if address.nil? or address.is_a?(String) == false
@@ -91,7 +102,7 @@ class SecondHunter < Sinatra::Base
     @user[:name] = session['first_name'] if session['first_name']
     erb :index
   end
-  get '/add' do
+  post '/add' do
     price = params[:price]
     p params
     raise StandardError, "Not all days were passed" unless price.count == 7
@@ -106,21 +117,19 @@ class SecondHunter < Sinatra::Base
     shop.create_price(price) if shop
     user.shops << shop
     
-    redirect to "/"
+    redirect to "/" unless request.xhr? 
+    send_response(shop, "Секонд успішно добавлений", "Сталась помилка під час добавлення")
   end
-  get '/shop/:id' do
-    @shop = Shop.find(params[:id])
-    json @shop.to_json
-  end
-  get '/shops' do
-    @shop = Shop.all
-    json @shop
+  get '/shops/:city' do
+    p params[:city]
+    shops = Shop.find_by_city(params[:city])
+    p shops
+    #json @shop
+    send_response(shops, "Секонди успішно завантажені", "Сталась помилка під час завантаження")
   end
   get '/template/:name' do
-    path = get_template_according_to_user_role(params[:name])
-    p path
     content_type 'text/plain', :charset => 'utf-8'
-    path
+    get_template_according_to_user_role(params[:name])
   end
   get '/profile' do
     p session
@@ -135,13 +144,15 @@ class SecondHunter < Sinatra::Base
     redirect to '/'
   end
   post '/delete/second/:id' do
-    json Shop.find(params[:id]).delete
+    result = Shop.find(params[:id]).delete
+    send_response(result,"Секонд успішно видалений","Сталась помилка під час видалення")
   end
   post '/edit/second/status/:id' do
     shop = Shop.find(params[:id])
     p shop.status
-    (shop.status) ? shop.update(:status => false) : shop.update(:status => true)
-    json shop.status
+    (shop && shop.status) ? shop.update(:status => false) : shop.update(:status => true)
+    #json shop.status
+    send_response(shop.status, "Статус секонда успішно змінений", "Сталась помилка при зміні статусу")
   end
   post '/edit/second/:id' do
     id = params[:id]
@@ -154,8 +165,7 @@ class SecondHunter < Sinatra::Base
     shop = Shop.find(id)
     shop.update(:title => title) if title
     shop.price.update(price) if price
-    json shop
-    #TODO: відіслати відповідь успішну або помилку
+    send_response(shop, "Секонд успішно оновлено", 'Сталась помилка при оновлені')
   end
   post '/blank.html' do
     url = URI.parse('http://ulogin.ru/token.php?token='+params[:token]) 

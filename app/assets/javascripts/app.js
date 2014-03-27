@@ -5,22 +5,31 @@ $(document).ready(function() {
     app.template = new Template();
     app.google_map = new GoogleMap();
 
-    /*google.maps.event.addListener(app.google_map.map, 'dragend', function() {
-        console.log("drag end");
-    });*/
+    $.notific8('configure', {
+        life: 5000,
+        theme: 'lime', //ruby for error
+        sticky: false,
+        horizontalEdge: 'top',
+        heading: 'Успішно :)',
+        verticalEdge: 'right',
+        zindex: 1500
+    });
+    app.alert = function(message, status){
+        var settings = {};
+        if(status === "error")settings = {theme: 'ruby', heading: 'Помилка :('};
+        if(status === "warning")settings = {theme: 'lemon', heading: 'Увага!'};
+        $.notific8(message, settings);
+    };
     /**
      * Завантажує один раз потрібний темплейнт
      *  в залежності від прав користувачів
      */
     app.template.pre_load('second_hand')
-            .then(app.google_map.set_shop_markers)
+            .then(app.google_map.get_seconds)
             .then(function(seconds) {
                 seconds.forEach(function(second) {
                     google.maps.event.addListener(second.info_window, 'domready', function() {
                         app.$context.trigger('second-info-window-opened');
-                    });
-                    google.maps.event.addListener(second.marker, 'click', function() {
-                        app.$context.trigger('second-marker-clicked');
                     });
                 });
             });
@@ -49,6 +58,25 @@ $(document).ready(function() {
             $('#second_address').on('mouseleave blur', function() {
                 var street = $(this).val();
                 app.google_map.get_lat_lng_from_address(street);
+            });
+            $('#add-second-form').on('submit', function(e){
+               e.preventDefault();
+               var data = $(this).serialize();
+               var action = $(this).attr('action');
+               console.log(data);
+               $.post(action, data)
+                 .done(function(response){
+                   console.log(response);
+                   if(response.status === "ok"){
+                       app.alert(response.message);
+                       //TODO: добавити маркер на мапу
+                   }else {
+                       app.alert(response.message, "error");
+                   }
+               }).fail(function(error){
+                   console.log(error);
+                   app.alert("Помилка при добавленні: " + error.status + " - " + error.statusText, "error");
+               });
             });
         });
     });

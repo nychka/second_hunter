@@ -14,9 +14,15 @@ $(document).ready(function() {
             console.log("saving");
             var data = form.serialize();
             console.log(data);
-            $.post(form.attr('action'), data).done(function(success) {
-                console.log(success);
-            }, function(error) {
+            $.post(form.attr('action'), data).done(function(response) {
+                if(response.status === "ok"){
+                    app.alert("Секонд-хенд успішно оновлений");
+                    console.log(response.data);
+                }else {
+                    app.alert(response.message, "error");
+                }
+            }).fail(function(error) {
+                app.alert("Помилка при оновленні: " + error.status + " - " + error.statusText, "error");
                 console.log(error);
             });
         });
@@ -75,10 +81,16 @@ $(document).ready(function() {
                 })
                 .on('click', function() {
                     console.log('star');
-                    $.post('/add/star/' + id).done(function(success) {
-                        console.log(success);
-                    }, function(err) {
-                        console.log(err);
+                    $.post('/add/star/' + id).done(function(response) {
+                         console.log(response);
+                        if(response.status === "ok"){
+                            app.alert(response.message);
+                        }else {
+                            app.alert(response.message, "error");
+                        }
+                    }).fail(function(error) {
+                        app.alert("Помилка при добавленні в улюблені: " + error.status + " - " + error.statusText, "error");
+                        console.log(error);
                     });
                 });
         // --- end star --- 
@@ -92,10 +104,16 @@ $(document).ready(function() {
         };
         status.on('click', function() {
             toggle_status($(this));
-            $.post('/edit/second/status/' + id).done(function(success) {
-                console.log(success);
-            }, function(err) {
-                console.log(err);
+            $.post('/edit/second/status/' + id).done(function(response) {
+                console.log(response);
+                if(response.status === "ok"){
+                    app.alert(response.message);
+                }else {
+                    app.alert(response.message, "error");
+                }
+            }).fail(function(error) {
+                app.alert("Помилка при зміні статусу: " + error.status + " - " + error.statusText, "error");
+                console.log(error);
             });
         }).on('mouseenter', function() {
             toggle_status($(this));
@@ -108,10 +126,16 @@ $(document).ready(function() {
             e.preventDefault();
             if (!confirm("Ви дійсно хочете видалити секонд-хенд?"))
                 return false;
-            $.post('/delete/second/' + id).done(function(success) {
-                console.log(success);
-            }, function(err) {
-                console.log(err);
+            $.post('/delete/second/' + id).done(function(response) {
+                console.log(response);
+                if(response.status === "ok"){
+                    app.alert(response.message);
+                }else {
+                    app.alert(response.message, "error");
+                }
+            }).fail(function(error) {
+                app.alert("Помилка при видалені: " + error.status + " - " + error.statusText, "error");
+                console.log(error);
             });
             console.log("I'm gonna destroy you " + id);
         });
