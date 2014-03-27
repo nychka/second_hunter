@@ -84,7 +84,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activemodel
   bson_ext
   json
   mongoid!
