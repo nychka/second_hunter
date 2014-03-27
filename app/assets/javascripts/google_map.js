@@ -123,7 +123,7 @@ function GoogleMap() {
             //3. записуємо координати в приховані поля форми
             self.set_hidden_lat_lng(lat, lng);
         }, function(err) {
-            console.log(err);
+           //console.log(err);
             app.alert(err, "warning");
             //1.Повертати маркер до поточного міста
             self.get_back_new_second_marker();
@@ -146,7 +146,7 @@ function GoogleMap() {
                 self.new_second_marker.setPosition(location);
                 self.set_hidden_lat_lng(location.lat(), location.lng());
             } else {
-                console.log("Geocode was not successful for the following reason: " + status);
+               //console.log("Geocode was not successful for the following reason: " + status);
                 app.alert("Geocode problem: " + status, "error");
             }
         });
@@ -212,7 +212,7 @@ function GoogleMap() {
                             street_number = street_number.long_name;
                             route = route.long_name;
                             var city = self.find_city_from_results(results);
-                            console.log(city);
+                           //console.log(city);
                             if (city !== self.current_city) {
                                 app.alert("Ви вийшли за межі міста!", "warning");
                                 errback.call(self, "City: " + city + " is not current city: " + self.current_city);
@@ -265,7 +265,7 @@ function GoogleMap() {
     this.get_seconds = function() {
         return new Promise(function(resolve, reject) {
             if (self.seconds[self.current_city]) {
-                console.log(self.seconds[self.current_city]);
+               //console.log(self.seconds[self.current_city]);
                 resolve(self.seconds[self.current_city]);
             } else {
                 $.get('/shops/' + self.current_city).done(function(response) {
@@ -277,7 +277,7 @@ function GoogleMap() {
                                 var second = new Second(shops[i], self.map);
                                 second.create_marker();
                             } catch (e) {
-                                console.log(e);
+                               //console.log(e);
                             }
                             seconds.push(second);
                         }
@@ -289,11 +289,11 @@ function GoogleMap() {
                             reject("Some seconds are missed!");
                         }
                     } else {
-                        console.log(response.message);
+                       //console.log(response.message);
                         app.alert(response.message, "error");
                     }
                 }).fail(function(error) {
-                    console.log(error);
+                   //console.log(error);
                     app.alert("Помилка при завантажені: " + error.status + " - " + error.statusText, "error");
                     reject(error);
                 });
