@@ -9,7 +9,7 @@ $(document).ready(function() {
         var input = $('<input />', {type: 'text', class: 'form-control'});
         var pencil = $('<span></span>', {id: 'pencil', class: 'glyphicon glyphicon-pencil'});
         var edittable = $('[data-edit=true]');
-        save.off().on('click', function(e) {
+        form.off().on('submit', function(e) {
             e.preventDefault();
             var data = form.serialize();
             $.post(form.attr('action'), data).done(function(response) {

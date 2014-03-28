@@ -1,2 +1,3 @@
+app/views/partials/guest/login.erb
 db/mongodb
 *~
