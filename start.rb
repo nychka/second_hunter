@@ -93,7 +93,7 @@ class SecondHunter < Sinatra::Base
     end
   end
   get '/' do
-    @title = "Second Hunter - for real clothes hunters!"
+    @title = "Second Hunter - моніторинг оновлень секонд-хендів"
     if (session['user_role'] && session['user_role'] == 2)
       @user_can_edit_second = true 
     end
