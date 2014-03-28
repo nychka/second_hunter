@@ -144,8 +144,8 @@ function GoogleMap() {
                 var location = results[0].geometry.location;
                 console.log(results);
                 var street_address = self.find_item_from_results(results, 'street_address');
-                console.log(street_address);
-                if(street_address){
+                var premise = self.find_item_from_results(results, 'premise');
+                if(street_address || premise){
                     var street_number = results[0].address_components[0].long_name;
                     var street = results[0].address_components[1].long_name;
                     var address = street + ", " + street_number;
@@ -159,8 +159,9 @@ function GoogleMap() {
                 }
                 
             } else {
-               //console.log("Geocode was not successful for the following reason: " + status);
-                app.alert("Geocode problem: " + status, "error");
+               console.log("Geocode was not successful for the following reason: " + status);
+               $('#second_address').val("");
+               app.alert(status, "warning");
             }
         });
     };
