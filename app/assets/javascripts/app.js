@@ -58,7 +58,7 @@ $(document).ready(function() {
                 app.$aside.hide().empty();
                 app.google_map.remove_new_second_marker();
             });
-            $('#second_address').on('mouseleave blur', function() {
+            $('#second_address').on('blur', function() {
                 var street = $(this).val();
                 app.google_map.get_lat_lng_from_address(street);
             });

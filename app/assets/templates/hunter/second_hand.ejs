@@ -3,7 +3,7 @@
 <form id="edit_second" data-second-id="<%=id%>" action="/edit/second/<%=id%>" method="POST">
     <div id="second-title">
                <span id="star" class="glyphicon glyphicon-star-empty pull-left"></span>
-               <span class="text-left pull-left" data-edit="true" data-name="title"><%= title %></span>
+               <span class="text-left pull-left" data-edit="true" data-match="(([а-яА-ЯA-Za-zєЄїЇіІь])+[\s-]?)+" data-name="title"><%= title %></span>
               <% if(status){ %>
                 <span id="status" class="glyphicon glyphicon-ok status-trusted pull-left"></span>
                <% }else { %>
@@ -28,13 +28,13 @@
       <tbody>
         <tr>
           <td>грн/кг</span></td>
-          <td data-role="price" data-edit="true" data-name="monday"><%= price.monday %></td>
-          <td data-role="price" data-edit="true" data-name="tuesday"><%= price.tuesday %></td>
-          <td data-role="price" data-edit="true" data-name="wednesday"><%= price.wednesday %></td>
-          <td data-role="price" data-edit="true" data-name="thursday"><%= price.thursday %></td>
-          <td data-role="price" data-edit="true" data-name="friday"><%= price.friday %> </td>
-          <td data-role="price" data-edit="true" data-name="saturday"><%= price.saturday %></td>
-          <td data-role="price" data-edit="true" data-name="sunday"><%= price.sunday %></td>
+          <td data-role="price" data-edit="true" data-match="[1-9]([0-9]){0,2}" data-name="monday"><%= price.monday %></td>
+          <td data-role="price" data-edit="true" data-match="[1-9]([0-9]){0,2}" data-name="tuesday"><%= price.tuesday %></td>
+          <td data-role="price" data-edit="true" data-match="[1-9]([0-9]){0,2}" data-name="wednesday"><%= price.wednesday %></td>
+          <td data-role="price" data-edit="true" data-match="[1-9]([0-9]){0,2}" data-name="thursday"><%= price.thursday %></td>
+          <td data-role="price" data-edit="true" data-match="[1-9]([0-9]){0,2}" data-name="friday"><%= price.friday %> </td>
+          <td data-role="price" data-edit="true" data-match="[1-9]([0-9]){0,2}" data-name="saturday"><%= price.saturday %></td>
+          <td data-role="price" data-edit="true" data-match="[1-9]([0-9]){0,2}" data-name="sunday"><%= price.sunday %></td>
         </tr>
       </tbody>
     </table>

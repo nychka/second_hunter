@@ -54,13 +54,17 @@ $(document).ready(function() {
                         return false;
                     var val = $this.text();
                     var name = $this.data('name');
+                    var pattern = $this.data('match');
                     ($this.data('role') === 'price') ? name = "price[" + name + "]" : name;
                     save.show();
                     cancel.show();
                     $this.text("");
                     //1. замінюємо інпутом
-                    input.clone().attr('data-original', val)
-                            .attr('name', name).val(val).appendTo($this);
+                    input.clone()
+                            .attr('data-original', val)
+                            .attr('name', name)
+                            .attr('pattern', pattern)
+                            .val(val).appendTo($this);
                 });
         //--- star ---
         var star_enter_class, star_leave_class;

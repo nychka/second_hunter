@@ -142,9 +142,22 @@ function GoogleMap() {
         this.geocoder.geocode({'address': address}, function(results, status) {
             if (status == google.maps.GeocoderStatus.OK) {
                 var location = results[0].geometry.location;
-                self.map.setCenter(location);
-                self.new_second_marker.setPosition(location);
-                self.set_hidden_lat_lng(location.lat(), location.lng());
+                console.log(results);
+                var street_address = self.find_item_from_results(results, 'street_address');
+                console.log(street_address);
+                if(street_address){
+                    var street_number = results[0].address_components[0].long_name;
+                    var street = results[0].address_components[1].long_name;
+                    var address = street + ", " + street_number;
+                    $('#second_address').val(address);
+                    self.map.setCenter(location);
+                    self.new_second_marker.setPosition(location);
+                    self.set_hidden_lat_lng(location.lat(), location.lng());
+                }else {
+                    $('#second_address').val("").attr('placeholder', "Наприклад: вулиця Вовчинецька, 226");
+                    app.alert("Неправильний формат адреси", "warning");
+                }
+                
             } else {
                //console.log("Geocode was not successful for the following reason: " + status);
                 app.alert("Geocode problem: " + status, "error");
@@ -163,15 +176,15 @@ function GoogleMap() {
         this.new_second_marker.setMap(null);
         $('.legend tr[data-role=new_second]').remove();
     };
-    this.find_city_from_results = function(results) {
+    this.find_item_from_results = function(results, address_type) {
         //console.log(results);
         if (results && results.length) {
             for (var i in results) {
                 var result = results[i], type = result.types[0];
-                if (type === 'locality') {
-                    var city = result.address_components[0].long_name;
-                    //console.log("Found city: " + city);
-                    return city;
+                if (type === address_type) {
+                    var address = result.address_components[0].long_name;
+                    console.log("Found address: " + address);
+                    return address;
                 }
             }
             return false;
@@ -183,7 +196,7 @@ function GoogleMap() {
         this.geocoder.geocode({'latLng': location}, function(results, status) {
             if (status == google.maps.GeocoderStatus.OK) {
                 //console.log(results);
-                var city = self.find_city_from_results(results)
+                var city = self.find_item_from_results(results, 'locality');
                 if (city) {
                     app.alert("Місто " + сity + " знайдено");
                     callback.call(self, city);
@@ -211,8 +224,8 @@ function GoogleMap() {
                                 route.types[0] === "route") {
                             street_number = street_number.long_name;
                             route = route.long_name;
-                            var city = self.find_city_from_results(results);
-                           //console.log(city);
+                            var city = self.find_item_from_results(results, 'locality');
+                            console.log(city);
                             if (city !== self.current_city) {
                                 app.alert("Ви вийшли за межі міста!", "warning");
                                 errback.call(self, "City: " + city + " is not current city: " + self.current_city);
