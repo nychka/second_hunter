@@ -30,7 +30,7 @@ class SecondHunter < Sinatra::Base
         p path
         return partial.to_sym if File.exists? path
       end
-      raise StandardError, "Partial was not found anywhere :("
+      halt "Partial was not found anywhere :("
     end
     def get_template_according_to_user_role(template)
       p "user_role: #{session["user_role"]}"
@@ -42,7 +42,7 @@ class SecondHunter < Sinatra::Base
         p path
         return File.open(path, "rb").read if File.exists? path
       end
-      raise StandardError, "Partial was not found anywhere :("
+      halt "Partial was not found anywhere :("
     end
     def partial(template, *args)
       options = args.extract_options!
@@ -102,17 +102,17 @@ class SecondHunter < Sinatra::Base
     @user[:name] = session['first_name'] if session['first_name']
     erb :index
   end
+  #TODO: придумати валідацію
   post '/add' do
     halt "Спочатку ввійдіть в систему" unless session["user_id"]
     price = params[:price]
     p params
-    raise StandardError, "Not all days were passed" unless price.count == 7
-    raise StandardError, "user_id is not defined in session" unless session["user_id"]
+    halt "Заповніть усі 7 днів" unless price.count == 7
     title = {:title => params[:title]} if params[:title].length > 3
     address = params[:address]
     
     user = User.find(session["user_id"])
-    raise StandardError, "User not found" if user.nil?
+    halt "User is not found" if user.nil?
     shop = Shop.new(title) if user
     shop.create_address(address) if shop
     shop.create_price(price) if shop
