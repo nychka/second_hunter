@@ -36,7 +36,7 @@ $(document).ready(function() {
         });
     });
     app.$context.bind('second-info-window-opened', function() {
-        console.log("second-info-window-opened");
+        //console.log("second-info-window-opened");
     });
     app.$context.bind('close-add-second-form', function(){
         if (app.$aside.is(":visible")) {
@@ -68,7 +68,7 @@ $(document).ready(function() {
                var action = $(this).attr('action');
                $.post(action, data)
                  .done(function(response){
-                   console.log(response);
+                   //console.log(response);
                    if(response.status === "ok"){
                        app.alert(response.message);
                        app.google_map.add_second(response.data);
@@ -76,7 +76,7 @@ $(document).ready(function() {
                        app.alert(response || response.message, "error");
                    }
                }).fail(function(error){
-                   console.log(error);
+                   //console.log(error);
                    app.alert("Помилка при добавленні: " + error.status + " - " + error.statusText, "error");
                });
             });

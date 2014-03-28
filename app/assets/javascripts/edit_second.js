@@ -22,7 +22,7 @@ $(document).ready(function() {
                 }
             }).fail(function(error) {
                 app.alert("Помилка при оновленні: " + error.status + " - " + error.statusText, "error");
-                console.log(error);
+               //console.log(error);
             });
         });
         cancel.off().on('click', function(e) {
@@ -87,7 +87,7 @@ $(document).ready(function() {
                         }
                     }).fail(function(error) {
                         app.alert("Помилка при добавленні в улюблені: " + error.status + " - " + error.statusText, "error");
-                        console.log(error);
+                       //console.log(error);
                     });
                 });
         // --- end star --- 
@@ -110,7 +110,7 @@ $(document).ready(function() {
                 }
             }).fail(function(error) {
                 app.alert("Помилка при зміні статусу: " + error.status + " - " + error.statusText, "error");
-                console.log(error);
+               //console.log(error);
             });
         }).on('mouseenter', function() {
             toggle_status($(this));
@@ -124,7 +124,7 @@ $(document).ready(function() {
             if (!confirm("Ви дійсно хочете видалити секонд-хенд?"))
                 return false;
             $.post('/delete/second/' + id).done(function(response) {
-                console.log(response);
+               //console.log(response);
                 if (response.status === "ok") {
                     if (app.google_map.remove_second(id))
                         app.alert(response.message);
@@ -133,7 +133,7 @@ $(document).ready(function() {
                 }
             }).fail(function(error) {
                 app.alert("Помилка при видалені: " + error.status + " - " + error.statusText, "error");
-                console.log(error);
+               //console.log(error);
             });
         });
         // --- end trash --- 
