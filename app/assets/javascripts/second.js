@@ -24,10 +24,11 @@ function Second(shop, map) {
         (shop.status) ? marker_days = trusted : marker_days = untrusted;
         this.icons = this.set_icons(marker_days);
         self.create_content().then(function(content) {
-            self.create_info_window(content);
+            //self.create_info_window(content);
+            self.create_info_bubble(content);
         });
     };
-    this.remove_marker = function(){
+    this.remove_marker = function() {
         this.marker.setMap(null);
     };
     this.set_icons = function(days) {
@@ -61,7 +62,18 @@ function Second(shop, map) {
         });
         self.marker = marker;
         google.maps.event.addListener(self.marker, 'click', function() {
-            self.info_window.open(self.map, self.marker);
+            //self.info_window.open(self.map, self.marker);
+            self.info_bubble.open(self.map, self.marker);
+            setTimeout(function() {
+                    console.log("info_bubble ready");
+                    $('td[data-name=' + self.DAYS[self.refresh_day] + ']').addClass('refreshDay');
+                    console.log($('td[data-name]'));
+                    console.log($('td[data-name=' + self.DAYS[self.refresh_day] + ']'));
+                    var today = new Date().getDay();
+                    $('td[data-name=' + self.DAYS[today] + ']').addClass('today');
+                    //new RefreshDay(days);
+                    app.$context.trigger('second-info-window-opened');
+            }, 500);
         });
         return marker;
     };
@@ -114,12 +126,28 @@ function Second(shop, map) {
         var html = app.template.get('second_hand', self.shop);
         return html;
     };
+    this.create_info_bubble = function(content) {
+        var info_bubble = new InfoBubble({
+            minWidth: 500,
+            content: content,
+            shadowStyle: 1,
+            padding: 0,
+            zIndex: 9999999,
+            backgroundColor: 'white',
+            borderRadius: 0,
+            arrowSize: 10,
+            borderWidth: 0,
+            borderColor: 'white'
+        });
+        this.info_bubble = info_bubble;
+    };
     this.create_info_window = function(content) {
         var info_window = new google.maps.InfoWindow({
             content: content
         });
         this.info_window = info_window;
         google.maps.event.addListener(this.info_window, 'domready', function() {
+            console.log("info_bubble ready");
             var days = $('td[data-name=' + self.DAYS[self.refresh_day] + ']').addClass('refreshDay');
             var today = new Date().getDay();
             $('td[data-name=' + self.DAYS[today] + ']').addClass('today');

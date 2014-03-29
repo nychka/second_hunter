@@ -7,11 +7,10 @@
                <% } %>
       </div>
       <div class="clearfix"></div>
-     <h3 class="text-left"><%= address.street %></h3>
+     <span class="pull-left text-left second-street"><%= address.street %></span>
  <table class="table">
       <thead>
         <tr>
-          <th>#</th>
           <th>Пн</th>
           <th>Вт</th>
           <th>Ср</th>
@@ -23,7 +22,6 @@
       </thead>
       <tbody>
         <tr>
-          <td>грн/кг</span></td>
           <td data-role="price" data-name="monday"><%= price.monday %></td>
           <td data-role="price" data-name="tuesday"><%= price.tuesday %></td>
           <td data-role="price" data-name="wednesday"><%= price.wednesday %></td>
