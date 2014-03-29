@@ -3,6 +3,7 @@ $(document).ready(function() {
         var form = $('#edit_second');
         var id = form.data('second-id');
         var star = $('#star');
+        var trash = $('#trash');
         var status = $('#status');
         var save = $('#save').hide();
         var cancel = $('#cancel').hide();
@@ -123,7 +124,7 @@ $(document).ready(function() {
         });
 
         // --- trash ---
-        $('#trash').off().on('click', function(e) {
+        trash.off().on('click', function(e) {
             e.preventDefault();
             if (!confirm("Ви дійсно хочете видалити секонд-хенд?"))
                 return false;

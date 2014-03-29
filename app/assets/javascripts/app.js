@@ -5,6 +5,19 @@ $(document).ready(function() {
     app.template = new Template();
     app.google_map = new GoogleMap();
 
+    setTimeout(function() {
+        console.log($('#legend'));
+        $('#legend').off().on('mouseenter', function() {
+            $(this).animate({marginRight: "0px"});
+        }).on('mouseleave', function() {
+            $(this).animate({marginRight: "-145px"});
+        }).on('click', function() {
+            var $this = $(this);
+            var right = $(this).css("marginRight");
+            (parseInt(right) === 0) ? $this.trigger('mouseenter') : $this.trigger('mouseleave');
+        }).trigger('mouseleave');
+    }, 1500);
+
     $.notific8('configure', {
         life: 5000,
         theme: 'lime', //ruby for error
@@ -14,10 +27,12 @@ $(document).ready(function() {
         verticalEdge: 'right',
         zindex: 1500
     });
-    app.alert = function(message, status){
+    app.alert = function(message, status) {
         var settings = {};
-        if(status === "error")settings = {theme: 'ruby', heading: 'Помилка :('};
-        if(status === "warning")settings = {theme: 'lemon', heading: 'Увага!'};
+        if (status === "error")
+            settings = {theme: 'ruby', heading: 'Помилка :('};
+        if (status === "warning")
+            settings = {theme: 'lemon', heading: 'Увага!'};
         $.notific8(message, settings);
     };
     /**
@@ -38,7 +53,7 @@ $(document).ready(function() {
     app.$context.bind('second-info-window-opened', function() {
         //console.log("second-info-window-opened");
     });
-    app.$context.bind('close-add-second-form', function(){
+    app.$context.bind('close-add-second-form', function() {
         if (app.$aside.is(":visible")) {
             app.$aside.find($('#add_second_cancel')).click();
             return true;
@@ -62,23 +77,23 @@ $(document).ready(function() {
                 var street = $(this).val();
                 app.google_map.get_lat_lng_from_address(street);
             });
-            $('#add-second-form').on('submit', function(e){
-               e.preventDefault();
-               var data = $(this).serialize();
-               var action = $(this).attr('action');
-               $.post(action, data)
-                 .done(function(response){
-                   //console.log(response);
-                   if(response.status === "ok"){
-                       app.alert(response.message);
-                       app.google_map.add_second(response.data);
-                   }else {
-                       app.alert(response || response.message, "error");
-                   }
-               }).fail(function(error){
-                   //console.log(error);
-                   app.alert("Помилка при добавленні: " + error.status + " - " + error.statusText, "error");
-               });
+            $('#add-second-form').on('submit', function(e) {
+                e.preventDefault();
+                var data = $(this).serialize();
+                var action = $(this).attr('action');
+                $.post(action, data)
+                        .done(function(response) {
+                            //console.log(response);
+                            if (response.status === "ok") {
+                                app.alert(response.message);
+                                app.google_map.add_second(response.data);
+                            } else {
+                                app.alert(response || response.message, "error");
+                            }
+                        }).fail(function(error) {
+                    //console.log(error);
+                    app.alert("Помилка при добавленні: " + error.status + " - " + error.statusText, "error");
+                });
             });
         });
     });

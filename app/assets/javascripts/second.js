@@ -72,8 +72,12 @@ function Second(shop, map) {
                     var today = new Date().getDay();
                     $('td[data-name=' + self.DAYS[today] + ']').addClass('today');
                     //new RefreshDay(days);
-                    app.$context.trigger('second-info-window-opened');
-            }, 500);
+                    if(self.info_bubble.isOpen()){
+                        app.$context.trigger('second-info-window-opened');
+                    }else {
+                        app.alert("info bubble is closed", "warning");
+                    }
+            }, 100);
         });
         return marker;
     };
@@ -132,7 +136,6 @@ function Second(shop, map) {
             content: content,
             shadowStyle: 1,
             padding: 0,
-            zIndex: 9999999,
             backgroundColor: 'white',
             borderRadius: 0,
             arrowSize: 10,

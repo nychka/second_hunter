@@ -29,7 +29,7 @@
       <%= yield %>
     </div>
      <div id="footer">
-      <p>&copy;&nbsp;&nbsp;<a href="http://vk.com/second_hunter">Second Hunter</a>&nbsp;&nbsp;2014</p>
+      <span>&copy;&nbsp;&nbsp;<a href="http://vk.com/second_hunter">Second Hunter</a>&nbsp;&nbsp;2014</span>
     </div>
     <script src="http://www.promisejs.org/implementations/promise/promise-3.2.0.js"></script>
     <script src="javascripts/lib/jquery-1.9.1.js"></script>
@@ -50,41 +50,5 @@
     <% if(@user_can_edit_second) %>
     <script type="text/javascript" src="javascripts/edit_second.js"></script>
     <% end %>
-    <!-- neformal.ru --> 
-    <script type="text/javascript">
-      var reformalOptions = {
-        project_id: 466744,
-        project_host: "second_hunter.reformal.ru",
-        tab_orientation: "left",
-        tab_indent: "50%",
-        tab_bg_color: "#68b34f",
-        tab_border_color: "#FFFFFF",
-        tab_image_url: "http://tab.reformal.ru/0JfQsNC70LjRiNGC0LUg0LLQsNGI0YMg0LTRg9C80LrRgyA6KQ==/FFFFFF/6c48e9f96ff6b16be3c59a93eff330a5/left/1/tab.png",
-        tab_border_width: 0
-      };
-
-      (function() {
-        var script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.async = true;
-        script.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'media.reformal.ru/widgets/v3/reformal.js';
-        document.getElementsByTagName('head')[0].appendChild(script);
-      })();
-    </script><noscript><a href="http://reformal.ru"><img src="http://media.reformal.ru/reformal.png" /></a><a href="http://second_hunter.reformal.ru">Залиште ваше враження :)</a></noscript>
-    <!-- end neformal.ru -->
-    <!-- AddThis Smart Layers BEGIN -->
-    <!-- Go to http://www.addthis.com/get/smart-layers to customize -->
-    <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-53298766671dd724"></script>
-    <script type="text/javascript">
-      addthis.layers({
-        theme: 'transparent',
-        share: {
-          position: 'right',
-          services: 'vk,facebook,twitter,linkedin,email',
-          postShareTitle: 'Second Hunter вдячний вам за підтримку!'
-        }
-      });
-    </script>
-    <!-- AddThis Smart Layers END -->
   </body>
 </html>

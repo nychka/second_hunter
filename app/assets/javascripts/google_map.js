@@ -8,7 +8,8 @@ function GoogleMap() {
         this.COUNTRY = "Україна";
         var mapOptions = {
             center: self.current_location,
-            zoom: 12
+            zoom: 12,
+            disableDefaultUI: true
         };
         this.map = new google.maps.Map(document.getElementById("map-canvas"),
                 mapOptions);
@@ -59,7 +60,7 @@ function GoogleMap() {
         var input = document.createElement('input');
         input.setAttribute('id', 'search-box');
         input.setAttribute('placeholder', "Пошук міста");
-        this.map.controls[google.maps.ControlPosition.TOP_CENTER].push(input);
+        this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
         this.search_box = new google.maps.places.SearchBox((input));
         google.maps.event.addListener(this.search_box, 'places_changed', function() {
             var places = self.search_box.getPlaces();
