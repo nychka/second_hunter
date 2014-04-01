@@ -132,6 +132,9 @@ input[data-role=day] {border-radius: 40px;}
 .second-hand .glyphicon-ok {}
 .second-street {font-size: 1.6em !important; padding-top: 5px; padding-bottom: 5px;}
 .status-trusted {color: green !important;}
+.shown {visibility: visible;}
+.hidden {visibility: hidden;}
+
 #trash, #save, #cancel {padding: 5px 10px 5px 10px  !important;margin-right: 10px;}
 #trash .glyphicon-trash, #save .glyphicon {font-size: 20px !important;}
 
@@ -160,5 +163,5 @@ input[data-role=day] {border-radius: 40px;}
       #search-box:focus {
         border-color: #4d90fe;
         opacity: 1;
-        width: 99%;
+        width: 98%;
       }

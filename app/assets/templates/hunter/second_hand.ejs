@@ -1,21 +1,20 @@
 <% var id = _id.$oid %>
 <div class="second-hand">
 <form id="edit_second" data-second-id="<%=id%>" action="/edit/second/<%=id%>" method="POST">
-    <div id="second-title">
+  <div id="second-title">
                <span id="star" class="glyphicon glyphicon-star-empty pull-left"></span>
                <span class="text-left pull-left" data-edit="true" data-match="(([а-яА-ЯA-Za-zєЄїЇіІь])+[\s-]?)+" data-name="title"><%= title %></span>
-              <% if(status){ %>
-                <span id="status" class="glyphicon glyphicon-ok status-trusted pull-left"></span>
+               <% if(status){ %>
+               <span id="status" class="glyphicon glyphicon-ok status-trusted pull-left"></span>
                <% }else { %>
                 <span id="status" class="glyphicon glyphicon-ok pull-left"></span>
                <% } %>
       </div>
       <div class="clearfix"></div>
-     <h3 class="text-left"><%= address.street %></h3>
+     <span class="pull-left text-left second-street"><%= address.street %></span>
  <table class="table">
       <thead>
         <tr>
-          <th>#</th>
           <th>Пн</th>
           <th>Вт</th>
           <th>Ср</th>
@@ -27,7 +26,6 @@
       </thead>
       <tbody>
         <tr>
-          <td>грн/кг</span></td>
           <td data-role="price" data-edit="true" data-match="[1-9]([0-9]){0,2}" data-name="monday"><%= price.monday %></td>
           <td data-role="price" data-edit="true" data-match="[1-9]([0-9]){0,2}" data-name="tuesday"><%= price.tuesday %></td>
           <td data-role="price" data-edit="true" data-match="[1-9]([0-9]){0,2}" data-name="wednesday"><%= price.wednesday %></td>
@@ -39,7 +37,7 @@
       </tbody>
     </table>
 <button id="trash" data-second-id="<%=id %>" class="btn btn-default pull-left"><span class="glyphicon glyphicon-trash"></span></button>
-<button id="save" type="submit" class="btn btn-primary pull-right"><span class="glyphicon glyphicon-floppy-disk"></span>Зберегти</button>
-<button id="cancel" class="btn btn-default pull-right"><span class="glyphicon"></span>Відмінити</button>
+<button id="save" type="submit" class="btn btn-primary pull-right hidden"><span class="glyphicon glyphicon-floppy-disk"></span>Зберегти</button>
+<button id="cancel" class="btn btn-default pull-right hidden"><span class="glyphicon"></span>Відмінити</button>
 </form>
 </div>

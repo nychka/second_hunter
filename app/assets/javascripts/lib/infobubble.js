@@ -1192,6 +1192,9 @@ InfoBubble.prototype.getContent = function() {
 };
 InfoBubble.prototype['getContent'] = InfoBubble.prototype.getContent;
 
+InfoBubble.prototype.getContainer = function(){
+    return (this.contentContainer_);
+};
 
 /**
  * Sets the marker content and adds loading events to images

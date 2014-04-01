@@ -62,10 +62,13 @@ function Second(shop, map) {
         });
         self.marker = marker;
         google.maps.event.addListener(self.marker, 'click', function() {
-            //self.info_window.open(self.map, self.marker);
+            //TODO: виправити завантаження скриптів під час відкриття вікна
             self.info_bubble.open(self.map, self.marker);
             setTimeout(function() {
+                    var parent = $(self.info_bubble.getContainer());
+                    console.log(parent);
                     console.log("info_bubble ready");
+                    console.log($('td[data-name=' + self.DAYS[self.refresh_day] + ']').length);
                     $('td[data-name=' + self.DAYS[self.refresh_day] + ']').addClass('refreshDay');
                     console.log($('td[data-name]'));
                     console.log($('td[data-name=' + self.DAYS[self.refresh_day] + ']'));
@@ -73,11 +76,11 @@ function Second(shop, map) {
                     $('td[data-name=' + self.DAYS[today] + ']').addClass('today');
                     //new RefreshDay(days);
                     if(self.info_bubble.isOpen()){
-                        app.$context.trigger('second-info-window-opened');
+                        app.$context.trigger('second-info-window-opened', parent);
                     }else {
                         app.alert("info bubble is closed", "warning");
                     }
-            }, 100);
+            }, 500);
         });
         return marker;
     };

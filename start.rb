@@ -42,7 +42,7 @@ class SecondHunter < Sinatra::Base
         p path
         return File.open(path, "rb").read if File.exists? path
       end
-      halt "Partial was not found anywhere :("
+      halt "Template was not found anywhere :("
     end
     def partial(template, *args)
       options = args.extract_options!
