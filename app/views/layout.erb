@@ -47,5 +47,11 @@
     <script type="text/javascript" src="javascripts/second.js"></script>
     <script type="text/javascript" src="javascripts/refresh_day.js"></script>
     <script type="text/javascript" src="javascripts/app.js"></script>
+    <script>
+      $('document').ready(function(){
+         app.user = <%= @user.to_json %>;
+         console.log(app.user);
+      });
+    </script>
   </body>
 </html>

@@ -19,6 +19,17 @@ class SecondHunter < Sinatra::Base
     set :user_roles, ["guest", "user", "hunter"]
   end
   helpers do
+    #Перевіряє чи користувач має право на видалення, підтвердження, редагування
+    def user_has_permissions?(shop_id, operation)
+      role = session["user_role"] # <= 0,1,2
+      permissions = [:delete, :edit, :set_status] if role == 2
+      permissions = [:delete, :edit] if role == 1 && user_added_shop?(shop_id)
+      halt "Permission denied" unless (permissions && permissions.include?(operation))
+      permissions
+    end
+    def user_added_shop? shop_id 
+      Shop.find(shop_id).user_id == session["user_id"]
+    end
     # В залежності від ролі користувача генерувати той чи інший партіал
     def get_partial_according_to_user_role(template)
       p "user_role: #{session["user_role"]}"
@@ -94,12 +105,10 @@ class SecondHunter < Sinatra::Base
   end
   get '/' do
     @title = "Second Hunter - моніторинг оновлень секонд-хендів"
-    if (session['user_role'] && session['user_role'] == 2)
-      @user_can_edit_second = true 
-    end
     @user = {}
     @user[:id] = session['user_id'] if session['user_id']
     @user[:name] = session['first_name'] if session['first_name']
+    @user[:role] = settings.user_roles[session['user_role']] if session['user_role']
     erb :index
   end
   #TODO: придумати валідацію
@@ -145,27 +154,32 @@ class SecondHunter < Sinatra::Base
     redirect to '/'
   end
   post '/delete/second/:id' do
-    result = Shop.find(params[:id]).delete
+    #TODO: перевірити права на видалення секонду
+    if user_has_permissions?(params[:id], :delete)
+      result = Shop.find(params[:id]).delete 
+    end
     send_response(result,"Секонд успішно видалений","Сталась помилка під час видалення")
   end
   post '/edit/second/status/:id' do
-    shop = Shop.find(params[:id])
-    p shop.status
-    (shop && shop.status) ? shop.update(:status => false) : shop.update(:status => true)
-    #json shop.status
+    if user_has_permissions?(params[:id], :set_status)
+      shop = Shop.find(params[:id])
+      (shop && shop.status) ? shop.update(:status => false) : shop.update(:status => true)
+    end
     send_response(shop, "Статус секонда успішно змінений", "Сталась помилка при зміні статусу")
   end
   post '/edit/second/:id' do
-    id = params[:id]
-    title = params[:title]
-    price = params[:price]
-    p params
-    params.delete("splat")
-    params.delete("id")
-    params.delete("captures")
-    shop = Shop.find(id)
-    shop.update(:title => title) if title
-    shop.price.update(price) if price
+    if user_has_permissions?(params[:id], :edit)
+      id = params[:id]
+      title = params[:title]
+      price = params[:price]
+      p params
+      params.delete("splat")
+      params.delete("id")
+      params.delete("captures")
+      shop = Shop.find(id)
+      shop.update(:title => title) if title
+      shop.price.update(price) if price
+    end
     send_response(shop, "Секонд успішно оновлено", 'Сталась помилка при оновлені')
   end
   post '/blank.html' do

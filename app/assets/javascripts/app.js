@@ -51,11 +51,9 @@ $(document).ready(function() {
         });
     });
     app.$context.bind('second-info-window-opened', function(e, parent) {
-        console.log(parent);
         var parent = $(parent);
         var form = parent.find('#edit_second');
         var id = form.data('second-id');
-        console.log("ID: " + id);
         var star = parent.find('#star');
         var trash = parent.find('#trash');
         var status = parent.find('#status');
@@ -81,7 +79,7 @@ $(document).ready(function() {
                     cancel.click();
                     app.alert("Секонд-хенд успішно оновлений");
                 } else {
-                    app.alert(response.message, "error");
+                    app.alert(response.message || response, "error");
                 }
             }).fail(function(error) {
                 app.alert("Помилка при оновленні: " + error.status + " - " + error.statusText, "error");
@@ -150,7 +148,7 @@ $(document).ready(function() {
                         if (response.status === "ok") {
                             app.alert(response.message);
                         } else {
-                            app.alert(response.message, "error");
+                             app.alert(response.message || response, "error");
                         }
                     }).fail(function(error) {
                         app.alert("Помилка при добавленні в улюблені: " + error.status + " - " + error.statusText, "error");
@@ -173,7 +171,7 @@ $(document).ready(function() {
                     app.google_map.replace_second(id, response.data);
                     app.alert(response.message);
                 } else {
-                    app.alert(response.message, "error");
+                    app.alert(response.message || response, "error");
                 }
             }).fail(function(error) {
                 app.alert("Помилка при зміні статусу: " + error.status + " - " + error.statusText, "error");
@@ -197,7 +195,7 @@ $(document).ready(function() {
                         app.alert(response.message);
                         $('.glyphicon-remove').click();
                 } else {
-                    app.alert(response.message, "error");
+                    app.alert(response.message || response, "error");
                 }
             }).fail(function(error) {
                 app.alert("Помилка при видалені: " + error.status + " - " + error.statusText, "error");

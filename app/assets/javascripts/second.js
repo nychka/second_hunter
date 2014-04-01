@@ -24,7 +24,8 @@ function Second(shop, map) {
         (shop.status) ? marker_days = trusted : marker_days = untrusted;
         this.icons = this.set_icons(marker_days);
         self.create_content().then(function(content) {
-            //self.create_info_window(content);
+            //TODO: remove unpermitted elements
+            //В залежності від прав видаляти елементи та події
             self.create_info_bubble(content);
         });
     };
@@ -62,19 +63,13 @@ function Second(shop, map) {
         });
         self.marker = marker;
         google.maps.event.addListener(self.marker, 'click', function() {
-            //TODO: виправити завантаження скриптів під час відкриття вікна
             self.info_bubble.open(self.map, self.marker);
             setTimeout(function() {
-                    var parent = $(self.info_bubble.getContainer());
-                    console.log(parent);
-                    console.log("info_bubble ready");
-                    console.log($('td[data-name=' + self.DAYS[self.refresh_day] + ']').length);
-                    $('td[data-name=' + self.DAYS[self.refresh_day] + ']').addClass('refreshDay');
-                    console.log($('td[data-name]'));
-                    console.log($('td[data-name=' + self.DAYS[self.refresh_day] + ']'));
-                    var today = new Date().getDay();
-                    $('td[data-name=' + self.DAYS[today] + ']').addClass('today');
-                    //new RefreshDay(days);
+                    var parent = $(self.info_bubble.getContainer()),
+                        today = new Date().getDay();
+                    parent.find('td[data-name=' + self.DAYS[self.refresh_day] + ']').addClass('refreshDay');
+                    parent.find('td[data-name=' + self.DAYS[today] + ']').addClass('today');
+                    //TODO: new RefreshDay(days);
                     if(self.info_bubble.isOpen()){
                         app.$context.trigger('second-info-window-opened', parent);
                     }else {
@@ -146,21 +141,6 @@ function Second(shop, map) {
             borderColor: 'white'
         });
         this.info_bubble = info_bubble;
-    };
-    this.create_info_window = function(content) {
-        var info_window = new google.maps.InfoWindow({
-            content: content
-        });
-        this.info_window = info_window;
-        google.maps.event.addListener(this.info_window, 'domready', function() {
-            console.log("info_bubble ready");
-            var days = $('td[data-name=' + self.DAYS[self.refresh_day] + ']').addClass('refreshDay');
-            var today = new Date().getDay();
-            $('td[data-name=' + self.DAYS[today] + ']').addClass('today');
-            //new RefreshDay(days);
-            app.$context.trigger('second-info-window-opened');
-        });
-        return this.info_window;
     };
     self.init(shop, map);
 }
