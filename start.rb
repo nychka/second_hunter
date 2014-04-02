@@ -8,7 +8,7 @@ class SecondHunter < Sinatra::Base
   set :server, :thin
   set :sessions, true
   set :logging, true
-  set :threaded, true
+  set :protection, :except => :frame_options
     
   configure do
     set :threaded, true
