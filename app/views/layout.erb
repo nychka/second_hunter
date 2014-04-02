@@ -28,13 +28,13 @@
     <div id="content" class="container">
       <%= yield %>
     </div>
-     <div id="footer">
+    <div id="footer">
       <span>&copy;&nbsp;&nbsp;<a href="http://vk.com/second_hunter">Second Hunter</a>&nbsp;&nbsp;2014</span>
     </div>
     <script src="http://www.promisejs.org/implementations/promise/promise-3.2.0.js"></script>
     <script src="javascripts/lib/jquery-1.9.1.js"></script>
     <script src="javascripts/lib/underscore-min.js"></script>
-    <script src="javascripts/lib/backbone-min.js"></script>
+    <!-- script src="javascripts/lib/backbone-min.js"></script -->
     <script src="bootstrap/js/bootstrap.min.js"></script>
     <script src="javascripts/lib/ejs.js"></script>
     <script src="javascripts/lib/jquery.notific8.js"></script>
@@ -46,12 +46,18 @@
     <script type="text/javascript" src="javascripts/google_map.js"></script>
     <script type="text/javascript" src="javascripts/second.js"></script>
     <script type="text/javascript" src="javascripts/refresh_day.js"></script>
-    <script type="text/javascript" src="javascripts/app.js"></script>
+    <script type="text/javascript" src="javascripts/user.js"></script>
     <script>
-      $('document').ready(function(){
-         app.user = <%= @user.to_json %>;
-         console.log(app.user);
+      $('document').ready(function() {
+        (function() {
+          if (!window.hasOwnProperty("app")) {
+            app = {};
+          }
+          var user = <%= @user.to_json %>;
+          app.user = new User(user);
+        })();
       });
     </script>
+    <script type="text/javascript" src="javascripts/app.js"></script>
   </body>
 </html>

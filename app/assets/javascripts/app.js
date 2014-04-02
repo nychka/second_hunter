@@ -1,22 +1,28 @@
 $(document).ready(function() {
-    window.app = {};
+    if (!window.hasOwnProperty("app")) {
+        app = {};
+    }
     app.$aside = $('#aside');
     app.$context = $('#map-canvas');
     app.template = new Template();
     app.google_map = new GoogleMap();
-
+    //console.log(app);
     setTimeout(function() {
-        console.log($('#legend'));
-        $('#legend').off().on('mouseenter', function() {
-            $(this).animate({marginRight: "0px"});
-        }).on('mouseleave', function() {
-            $(this).animate({marginRight: "-145px"});
-        }).on('click', function() {
+        var legend = $('#legend');
+        var height = legend.find('thead').height();
+        var margin = "-" + ($('#legendContainer').height() - height) + "px";
+        //console.log(margin);
+        //legend.css({marginBottom: margin});
+        legend.off().on('click', function() {
             var $this = $(this);
-            var right = $(this).css("marginRight");
-            (parseInt(right) === 0) ? $this.trigger('mouseenter') : $this.trigger('mouseleave');
-        }).trigger('mouseleave');
-    }, 1500);
+            var marginBottom = $this.css("marginBottom");
+            if (parseInt(marginBottom) === 0) {
+                $this.finish().animate({marginBottom: margin});
+            } else {
+                $this.finish().animate({marginBottom: "0px"});
+            }
+        }).click();
+    }, 3000);
 
     $.notific8('configure', {
         life: 5000,
@@ -50,9 +56,20 @@ $(document).ready(function() {
             app.$context.trigger('click-add-second-button');
         });
     });
-    app.$context.bind('second-info-window-opened', function(e, parent) {
-        var parent = $(parent);
+    app.$context.bind('second-info-window-opened', function(e, data) {
+        //console.log(app.user.role);
+        //console.log(data.shop);
+        //console.log(app.user.can("edit", data.shop));
+
+        var parent = $(data.parent);
         var form = parent.find('#edit_second');
+
+        if (!app.user.can("edit", data.shop)) {
+            //видалити всі buttons
+            form.children(":first").unwrap();
+            return false;
+        }
+
         var id = form.data('second-id');
         var star = parent.find('#star');
         var trash = parent.find('#trash');
@@ -70,11 +87,11 @@ $(document).ready(function() {
                     //1. замінити оновлені поля або сам маркер
                     app.google_map.replace_second(id, response.data);
                     //2. оновити дані у формі та нажати відміна
-                    edittable.find('input[data-original]').each(function(){
+                    edittable.find('input[data-original]').each(function() {
                         var $this = $(this),
-                            val = $this.val();
-                            console.log(val);
-                            $this.attr('data-original', val);
+                                val = $this.val();
+                        //console.log(val);
+                        $this.attr('data-original', val);
                     });
                     cancel.click();
                     app.alert("Секонд-хенд успішно оновлений");
@@ -83,7 +100,7 @@ $(document).ready(function() {
                 }
             }).fail(function(error) {
                 app.alert("Помилка при оновленні: " + error.status + " - " + error.statusText, "error");
-               //console.log(error);
+                ////console.log(error);
             });
         });
         cancel.off().on('click', function(e) {
@@ -94,8 +111,8 @@ $(document).ready(function() {
                 $(this).parent().text(val);
                 input.remove();
             });
-            cancel.addClass('hidden');
-            save.addClass('hidden');
+            cancel.addClass('unvisible');
+            save.addClass('unvisible');
         });
 
         edittable.off().on('mouseenter', function() {
@@ -117,8 +134,8 @@ $(document).ready(function() {
                     var name = $this.data('name');
                     var pattern = $this.data('match');
                     ($this.data('role') === 'price') ? name = "price[" + name + "]" : name;
-                    save.removeClass('hidden');
-                    cancel.removeClass('hidden');
+                    save.removeClass('unvisible');
+                    cancel.removeClass('unvisible');
                     $this.text("");
                     //1. замінюємо інпутом
                     input.clone()
@@ -148,11 +165,11 @@ $(document).ready(function() {
                         if (response.status === "ok") {
                             app.alert(response.message);
                         } else {
-                             app.alert(response.message || response, "error");
+                            app.alert(response.message || response, "error");
                         }
                     }).fail(function(error) {
                         app.alert("Помилка при добавленні в улюблені: " + error.status + " - " + error.statusText, "error");
-                       //console.log(error);
+                        ////console.log(error);
                     });
                 });
         // --- end star --- 
@@ -164,44 +181,47 @@ $(document).ready(function() {
                 status.addClass('status-trusted');
             }
         };
-        status.off().on('click', function() {
-            toggle_status($(this));
-            $.post('/edit/second/status/' + id).done(function(response) {
-                if (response.status === "ok") {
-                    app.google_map.replace_second(id, response.data);
-                    app.alert(response.message);
-                } else {
-                    app.alert(response.message || response, "error");
-                }
-            }).fail(function(error) {
-                app.alert("Помилка при зміні статусу: " + error.status + " - " + error.statusText, "error");
-               //console.log(error);
-            });
-        }).on('mouseenter', function() {
-            toggle_status($(this));
-        }).on('mouseleave', function() {
-            toggle_status($(this));
-        });
-
-        // --- trash ---
-        trash.off().on('click', function(e) {
-            e.preventDefault();
-            if (!confirm("Ви дійсно хочете видалити секонд-хенд?"))
-                return false;
-            $.post('/delete/second/' + id).done(function(response) {
-               //console.log(response);
-                if (response.status === "ok") {
-                    if (app.google_map.remove_second(id))
+        if (app.user.can("set_status", data.shop)) {
+            status.off().on('click', function() {
+                toggle_status($(this));
+                $.post('/edit/second/status/' + id).done(function(response) {
+                    if (response.status === "ok") {
+                        app.google_map.replace_second(id, response.data);
                         app.alert(response.message);
-                        $('.glyphicon-remove').click();
-                } else {
-                    app.alert(response.message || response, "error");
-                }
-            }).fail(function(error) {
-                app.alert("Помилка при видалені: " + error.status + " - " + error.statusText, "error");
-               //console.log(error);
+                    } else {
+                        app.alert(response.message || response, "error");
+                    }
+                }).fail(function(error) {
+                    app.alert("Помилка при зміні статусу: " + error.status + " - " + error.statusText, "error");
+                    ////console.log(error);
+                });
+            }).on('mouseenter', function() {
+                toggle_status($(this));
+            }).on('mouseleave', function() {
+                toggle_status($(this));
             });
-        });
+        }
+        // --- trash ---
+        if (app.user.can("delete", data.shop)) {
+            trash.removeClass('unvisible').off().on('click', function(e) {
+                e.preventDefault();
+                if (!confirm("Ви дійсно хочете видалити секонд-хенд?"))
+                    return false;
+                $.post('/delete/second/' + id).done(function(response) {
+                    ////console.log(response);
+                    if (response.status === "ok") {
+                        if (app.google_map.remove_second(id))
+                            app.alert(response.message);
+                        $('.glyphicon-remove').click();
+                    } else {
+                        app.alert(response.message || response, "error");
+                    }
+                }).fail(function(error) {
+                    app.alert("Помилка при видалені: " + error.status + " - " + error.statusText, "error");
+                    ////console.log(error);
+                });
+            });
+        }
         // --- end trash --- 
     });
     app.$context.bind('close-add-second-form', function() {
@@ -234,7 +254,7 @@ $(document).ready(function() {
                 var action = $(this).attr('action');
                 $.post(action, data)
                         .done(function(response) {
-                            //console.log(response);
+                            ////console.log(response);
                             if (response.status === "ok") {
                                 app.alert(response.message);
                                 app.google_map.add_second(response.data);
@@ -242,7 +262,7 @@ $(document).ready(function() {
                                 app.alert(response || response.message, "error");
                             }
                         }).fail(function(error) {
-                    //console.log(error);
+                    ////console.log(error);
                     app.alert("Помилка при добавленні: " + error.status + " - " + error.statusText, "error");
                 });
             });

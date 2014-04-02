@@ -275,7 +275,8 @@ function GoogleMap() {
         return html;
     };
     this.add_legend = function(legend) {
-        this.map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legend);
+        $('#legendContainer').append(legend);
+        //this.map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(legend);
     };
     this.get_seconds = function() {
         return new Promise(function(resolve, reject) {

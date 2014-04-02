@@ -19,6 +19,10 @@ class SecondHunter < Sinatra::Base
     set :user_roles, ["guest", "user", "hunter"]
   end
   helpers do
+    def user_role
+      role = session['user_role'] || 0
+      settings.user_roles[role]
+    end
     #Перевіряє чи користувач має право на видалення, підтвердження, редагування
     def user_has_permissions?(shop_id, operation)
       role = session["user_role"] # <= 0,1,2
@@ -106,9 +110,9 @@ class SecondHunter < Sinatra::Base
   get '/' do
     @title = "Second Hunter - моніторинг оновлень секонд-хендів"
     @user = {}
-    @user[:id] = session['user_id'] if session['user_id']
-    @user[:name] = session['first_name'] if session['first_name']
-    @user[:role] = settings.user_roles[session['user_role']] if session['user_role']
+    @user[:id] = session['user_id'] || 0
+    @user[:name] = session['first_name'] || "guest"
+    @user[:role] = user_role
     erb :index
   end
   #TODO: придумати валідацію

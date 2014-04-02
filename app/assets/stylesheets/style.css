@@ -107,6 +107,7 @@ body {
 .today {background-color: whitesmoke !important;}
 input[data-role=day] {border-radius: 40px;}
 #legend {background-color: white; padding: 5px;}
+#legend thead {line-height: 2em;}
 #uLogin {padding: 15px;}
 #footer {font-size: 15px; margin-bottom: 5px;}
 #second-title .glyphicon, #second-title [data-name=title] {
@@ -132,9 +133,10 @@ input[data-role=day] {border-radius: 40px;}
 .second-hand .glyphicon-ok {}
 .second-street {font-size: 1.6em !important; padding-top: 5px; padding-bottom: 5px;}
 .status-trusted {color: green !important;}
-.shown {visibility: visible;}
-.hidden {visibility: hidden;}
 
+.unvisible {visibility: hidden;}
+
+#legendContainer {position: absolute; bottom: 0;right: 0; margin: 0 auto; overflow: hidden;}
 #trash, #save, #cancel {padding: 5px 10px 5px 10px  !important;margin-right: 10px;}
 #trash .glyphicon-trash, #save .glyphicon {font-size: 20px !important;}
 

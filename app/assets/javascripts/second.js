@@ -4,6 +4,7 @@ function Second(shop, map) {
         this.DAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
         this.shop = shop;
         this.id = this.shop["_id"]["$oid"];
+        this.user_id = this.shop["user_id"]["$oid"];
         this.second_show_time = 200;
         this.position = {lng: shop.address.lng, lat: shop.address.lat};
         this.map = map;
@@ -24,7 +25,6 @@ function Second(shop, map) {
         (shop.status) ? marker_days = trusted : marker_days = untrusted;
         this.icons = this.set_icons(marker_days);
         self.create_content().then(function(content) {
-            //TODO: remove unpermitted elements
             //В залежності від прав видаляти елементи та події
             self.create_info_bubble(content);
         });
@@ -71,11 +71,11 @@ function Second(shop, map) {
                     parent.find('td[data-name=' + self.DAYS[today] + ']').addClass('today');
                     //TODO: new RefreshDay(days);
                     if(self.info_bubble.isOpen()){
-                        app.$context.trigger('second-info-window-opened', parent);
+                        app.$context.trigger('second-info-window-opened', {parent: parent, shop: self.shop});
                     }else {
                         app.alert("info bubble is closed", "warning");
                     }
-            }, 500);
+            }, 100);
         });
         return marker;
     };

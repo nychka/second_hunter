@@ -2,7 +2,7 @@
 <div class="second-hand">
 <form id="edit_second" data-second-id="<%=id%>" action="/edit/second/<%=id%>" method="POST">
   <div id="second-title">
-               <span id="star" class="glyphicon glyphicon-star-empty pull-left"></span>
+               <span id="star" class="glyphicon glyphicon-star-empty pull-left unvisible"></span>
                <span class="text-left pull-left" data-edit="true" data-match="(([а-яА-ЯA-Za-zєЄїЇіІь])+[\s-]?)+" data-name="title"><%= title %></span>
                <% if(status){ %>
                <span id="status" class="glyphicon glyphicon-ok status-trusted pull-left"></span>
@@ -36,8 +36,8 @@
         </tr>
       </tbody>
     </table>
-<button id="trash" data-second-id="<%=id %>" class="btn btn-default pull-left"><span class="glyphicon glyphicon-trash"></span></button>
-<button id="save" type="submit" class="btn btn-primary pull-right hidden"><span class="glyphicon glyphicon-floppy-disk"></span>Зберегти</button>
-<button id="cancel" class="btn btn-default pull-right hidden"><span class="glyphicon"></span>Відмінити</button>
+<button id="trash" data-second-id="<%=id %>" class="btn btn-default pull-left unvisible"><span class="glyphicon glyphicon-trash"></span></button>
+<button id="save" type="submit" class="btn btn-primary pull-right unvisible"><span class="glyphicon glyphicon-floppy-disk"></span>Зберегти</button>
+<button id="cancel" class="btn btn-default pull-right unvisible"><span class="glyphicon"></span>Відмінити</button>
 </form>
 </div>
